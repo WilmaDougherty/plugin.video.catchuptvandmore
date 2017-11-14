@@ -41,6 +41,10 @@ msgctxt "#30005"
 msgid "Advanced settings"
 msgstr ""
 
+msgctxt "#30006"
+msgid "Catch-up TV"
+msgstr ""
+
 # Settings line separators (from 30010 to 30019)
 msgctxt "#30010"
 msgid "Hide main menu categories"

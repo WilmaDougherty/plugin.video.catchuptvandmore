@@ -61,93 +61,117 @@ def root(params):
     with all not hidden categories
     """
 
-    # First, we sort main menu by order
-    categories = []
-    for category_id, title in skeleton.CATEGORIES.iteritems():
-        # If category isn't disable
-        if common.PLUGIN.get_setting(category_id):
-            category_order = common.PLUGIN.get_setting(category_id + '.order')
-            category = (category_order, category_id, title)
-            categories.append(category)
+    print '# Enter in root(params)'
 
-    categories = sorted(categories, key=lambda x: x[0])
+    # If we just launch the addon
+    if 'depth' not in params:
+        params['depth'] = 0
+        params['id_0'] = 'root'
+        params['folder_0'] = ''
+
+    print 'params[depth]: ' + str(params['depth'])
+
+    menu_dict = skeleton.SKELETON
+    for i in range(0, params.depth + 1):
+        print '# i: ' + str(i)
+        print '# params[id_' + str(i) + ']: ' + params['id_' + str(i)]
+        menu_dict = menu_dict[params['id_' + str(i)]]
+        print '# current_menu_dict: ' + repr(menu_dict)
+
+    # First we sort the current menu
+    menu = []
+    for item_id in menu_dict:
+        print '# item_id: ' + item_id
+        # If menu item isn't disable
+        if common.PLUGIN.get_setting(item_id):
+            item_order = common.PLUGIN.get_setting(item_id + '.order')
+            item_title = skeleton.LABELS[item_id]
+            item_folder = skeleton.FOLDERS[item_id]
+            item = (item_order, item_id, item_title, item_folder)
+            menu.append(item)
+
+    menu = sorted(menu, key=lambda x: x[0])
 
     listing = []
-    last_category_id = ''
-    for index, (order, category_id, title) in enumerate(categories):
-        if common.PLUGIN.get_setting(category_id):
-            last_category_id = category_id
-            last_window_title = _(title)
+    last_item_id = ''
+    for index, (item_order, item_id, item_title, item_folder) \
+            in enumerate(menu):
+        last_item_id = item_id
+        last_window_title = _(item_title)
 
-            # Build context menu (Move up, move down, ...)
-            context_menu = []
+        # Build context menu (Move up, move down, ...)
+        context_menu = []
 
-            item_down = (
-                _('Move down'),
-                'XBMC.RunPlugin(' + common.PLUGIN.get_url(
-                    action='move',
-                    direction='down',
-                    item_id_order=category_id + '.order',
-                    displayed_items=categories) + ')'
+        item_down = (
+            _('Move down'),
+            'XBMC.RunPlugin(' + common.PLUGIN.get_url(
+                action='move',
+                direction='down',
+                item_id_order=item_id + '.order',
+                displayed_items=menu) + ')'
+        )
+        item_up = (
+            _('Move up'),
+            'XBMC.RunPlugin(' + common.PLUGIN.get_url(
+                action='move',
+                direction='up',
+                item_id_order=item_id + '.order',
+                displayed_items=menu) + ')'
+        )
+
+        if index == 0:
+            context_menu.append(item_down)
+        elif index == len(menu) - 1:
+            context_menu.append(item_up)
+        else:
+            context_menu.append(item_up)
+            context_menu.append(item_down)
+
+        hide = (
+            _('Hide'),
+            'XBMC.RunPlugin(' + common.PLUGIN.get_url(
+                action='hide',
+                item_id=item_id) + ')'
+        )
+        context_menu.append(hide)
+
+        context_menu.append(utils.vpn_context_menu_item())
+
+        '''
+        media_item_path = common.sp.xbmc.translatePath(
+            common.sp.os.path.join(
+                MEDIA_PATH,
+                'categories',
+                category_id[-2:]
             )
-            item_up = (
-                _('Move up'),
-                'XBMC.RunPlugin(' + common.PLUGIN.get_url(
-                    action='move',
-                    direction='up',
-                    item_id_order=category_id + '.order',
-                    displayed_items=categories) + ')'
-            )
+        )
 
-            if index == 0:
-                context_menu.append(item_down)
-            elif index == len(categories) - 1:
-                context_menu.append(item_up)
-            else:
-                context_menu.append(item_up)
-                context_menu.append(item_down)
+        media_category_path = media_category_path.decode(
+            "utf-8").encode(common.FILESYSTEM_CODING)
 
-            hide = (
-                _('Hide'),
-                'XBMC.RunPlugin(' + common.PLUGIN.get_url(
-                    action='hide',
-                    item_id=category_id) + ')'
-            )
-            context_menu.append(hide)
+        icon = media_category_path + '.png'
+        fanart = media_category_path + '_fanart.jpg'
+        '''
 
-            context_menu.append(utils.vpn_context_menu_item())
-
-            media_category_path = common.sp.xbmc.translatePath(
-                common.sp.os.path.join(
-                    MEDIA_PATH,
-                    'categories',
-                    category_id[-2:]
-                )
-            )
-
-            media_category_path = media_category_path.decode(
-                "utf-8").encode(common.FILESYSTEM_CODING)
-
-            icon = media_category_path + '.png'
-            fanart = media_category_path + '_fanart.jpg'
-
-            listing.append({
-                'icon': icon,
-                'fanart': fanart,
-                'label': _(title),
-                'url': common.PLUGIN.get_url(
-                    action='list_channels',
-                    category_id=category_id,
-                    window_title=_(title)
-                ),
-                'context_menu': context_menu
-            })
+        listing.append({
+            # 'icon': icon,
+            # 'fanart': fanart,
+            'label': _(item_title),
+            'url': common.PLUGIN.get_url(
+                action='list_channels',
+                item_id=item_id,
+                item_folder=item_folder,
+                depth=params.depth + 1,
+                window_title=_(item_title)
+            ),
+            'context_menu': context_menu
+        })
 
     # If only one category is present, directly open this category
     if len(listing) == 1:
-        params['category_id'] = last_category_id
+        params['item_id'] = last_item_id
         params['window_title'] = last_window_title
-        return list_channels(params)
+        return root(params)
 
     return common.PLUGIN.create_listing(
         listing,
