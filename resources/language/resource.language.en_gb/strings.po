@@ -22,7 +22,7 @@ msgid "Main menu"
 msgstr ""
 
 msgctxt "#30001"
-msgid "Channels"
+msgid "Countries"
 msgstr ""
 
 msgctxt "#30002"
@@ -42,8 +42,13 @@ msgid "Advanced settings"
 msgstr ""
 
 msgctxt "#30006"
-msgid "Catch-up TV"
+msgid "Channels"
 msgstr ""
+
+msgctxt "#30007"
+msgid "Websites"
+msgstr ""
+
 
 # Settings line separators (from 30010 to 30019)
 msgctxt "#30010"
@@ -51,45 +56,36 @@ msgid "Hide main menu categories"
 msgstr ""
 
 msgctxt "#30011"
-msgid "Hide channels from categories"
+msgid "Hide channels"
 msgstr ""
 
 msgctxt "#30012"
 msgid "To configure YTDL go settings of script.module.youtube.dl"
 msgstr ""
 
-# Main categories (from 30020 to 30039)
+msgctxt "#30013"
+msgid "Hide countries"
+msgstr ""
+
+msgctxt "#30014"
+msgid "Hide websites"
+msgstr ""
+
+
+# Root listing (from 30020 to 30039)
 msgctxt "#30020"
-msgid "French channels"
+msgid "Live TV"
 msgstr ""
 
 msgctxt "#30021"
-msgid "Belgian channels"
+msgid "Catch-up TV"
 msgstr ""
 
 msgctxt "#30022"
-msgid "Japanese channels"
-msgstr ""
-
-msgctxt "#30023"
-msgid "Switzerland channels"
-msgstr ""
-
-msgctxt "#30024"
-msgid "United Kingdom channels"
-msgstr ""
-
-msgctxt "#30025"
-msgid "International channels"
-msgstr ""
-
-msgctxt "#30026"
 msgid "Websites"
 msgstr ""
 
-msgctxt "#30027"
-msgid "Connect VPN"
-msgstr ""
+
 
 # Context menu (from 30040 to 30049)
 msgctxt "#30040"
@@ -106,6 +102,14 @@ msgstr ""
 
 msgctxt "#30043"
 msgid "Download"
+msgstr ""
+
+msgctxt "#30044"
+msgid "Connect VPN"
+msgstr ""
+
+msgctxt "#30045"
+msgid "Disconnect VPN"
 msgstr ""
 
 
@@ -128,24 +132,29 @@ msgctxt "#30071"
 msgid "Contents"
 msgstr ""
 
-msgctxt "#30080"
+msgctxt "#30072"
 msgid "Arte: Choose Channel"
 msgstr ""
 
-msgctxt "#30081"
+msgctxt "#30073"
 msgid "France 24: Choose Channel"
 msgstr ""
 
-msgctxt "#30082"
+msgctxt "#30074"
 msgid "Euronews: Choose Channel"
 msgstr ""
 
-msgctxt "#30087"
+msgctxt "#30075"
 msgid "Video quality (BEST|DEFAULT|DIALOG)"
 msgstr ""
 
+msgctxt "#30076"
+msgid "International channels"
+msgstr ""
 
-# Others (from 30100 to 30140)
+
+
+# Others (from 30100 to 30139)
 msgctxt "#30100"
 msgid "More videos..."
 msgstr ""
@@ -183,122 +192,160 @@ msgid "More programs..."
 msgstr ""
 
 msgctxt "#30109"
-msgid "Live TV"
-msgstr ""
-
-msgctxt "#30110"
 msgid "Choose video quality"
 msgstr ""
 
-msgctxt "#30111"
+msgctxt "#30110"
 msgid "Video stream no longer exists"
 msgstr ""
 
-msgctxt "#30112"
+msgctxt "#30111"
 msgid "Video with an account needed"
 msgstr ""
 
-# Download (from 30200 to 30240)
 
-msgctxt "#30200"
+
+# Download (from 30140 to 30149)
+
+msgctxt "#30140"
 msgid "Folder to Download"
 msgstr ""
 
-# Advanced settings (from 30300 to 30340)
 
-msgctxt "#30300"
+
+# Advanced settings (from 30150 to 30159)
+
+msgctxt "#30150"
 msgid "Clear cache"
 msgstr ""
 
-msgctxt "#30301"
+msgctxt "#30151"
 msgid "Cache cleared"
 msgstr ""
 
-# OpenVPN (from 30340 to 30370)
-msgctxt "#30340"
+
+
+# OpenVPN (from 30160 to 30199)
+msgctxt "#30160"
 msgid "Enable VPN feature"
 msgstr ""
 
-msgctxt "#30341"
+msgctxt "#30161"
 msgid "OpenVPN filepath"
 msgstr ""
 
-msgctxt "#30342"
+msgctxt "#30162"
 msgid "Import OpenVPN configuration file"
 msgstr ""
 
-msgctxt "#30343"
+msgctxt "#30163"
 msgid "Delete OpenVPN configuration file"
 msgstr ""
 
-msgctxt "#30344"
+msgctxt "#30164"
 msgid "Additional arguments"
 msgstr ""
 
-msgctxt "#30345"
+msgctxt "#30165"
 msgid "Run OpenVPN with superuser privileges (sudo)"
 msgstr ""
 
-msgctxt "#30346"
+msgctxt "#30166"
 msgid "Ask for sudo password"
 msgstr ""
 
-msgctxt "#30347"
+msgctxt "#30167"
 msgid "Connect VPN"
 msgstr ""
 
-msgctxt "#30348"
+msgctxt "#30168"
 msgid "Choose a name for OpenVPN configuration"
 msgstr ""
 
-msgctxt "#30349"
+msgctxt "#30169"
 msgid "This OpenVPN configuration name already exists. Overwrite?"
 msgstr ""
 
-msgctxt "#30350"
+msgctxt "#30170"
 msgid "Import cancelled"
 msgstr ""
 
-msgctxt "#30351"
+msgctxt "#30171"
 msgid "Import failed. You must specify a name for the OpenVPN configuration"
 msgstr ""
 
-msgctxt "#30352"
+msgctxt "#30172"
 msgid "Select OpenVPN configuration to run"
 msgstr ""
 
-msgctxt "#30353"
+msgctxt "#30173"
 msgid "Enter your sudo password"
 msgstr ""
 
-msgctxt "#30354"
+msgctxt "#30174"
 msgid "Started VPN connection"
 msgstr ""
 
-msgctxt "#30355"
+msgctxt "#30175"
 msgid "Stopped VPN connection"
 msgstr ""
 
-msgctxt "#30356"
+msgctxt "#30176"
 msgid "An existing OpenVPN instance appears to be running."
 msgstr ""
 
-msgctxt "#30357"
+msgctxt "#30177"
 msgid "Disconnect it?"
 msgstr ""
 
-msgctxt "#30358"
+msgctxt "#30178"
 msgid "An error has occurred whilst trying to connect OpenVPN"
 msgstr ""
 
-msgctxt "#30359"
-msgid "Disconnect VPN"
-msgstr ""
-
-msgctxt "#30360"
+msgctxt "#30179"
 msgid "Select OpenVPN configuration to delete"
 msgstr ""
 
-msgctxt "#30361"
+msgctxt "#30180"
 msgid "Connect/Disconnect VPN"
 msgstr ""
+
+
+
+# Coutries (from 30200 to 30299)
+
+msgctxt "#30200"
+msgid "Switzerland"
+msgstr ""
+
+msgctxt "#30201"
+msgid "United Kingdom"
+msgstr ""
+
+msgctxt "#30202"
+msgid "International"
+msgstr ""
+
+msgctxt "#30203"
+msgid "Belgium"
+msgstr ""
+
+msgctxt "#30204"
+msgid "France"
+msgstr ""
+
+msgctxt "#30205"
+msgid "Japan"
+msgstr ""
+
+
+
+
+
+
+
+
+
+
+
+

@@ -64,31 +64,25 @@ def root(params):
     print '# Enter in root(params)'
 
     # If we just launch the addon
-    if 'depth' not in params:
-        params['depth'] = 0
-        params['id_0'] = 'root'
-        params['folder_0'] = ''
+    if 'menu_dict' not in params:
+        params['menu_dict'] = skeleton.SKELETON
+        params['path'] = []
+    else:
+        params['menu_dict'] = eval(params['menu_dict'])
+        params['path'] = eval(params['path'])
 
-    print 'params[depth]: ' + str(params['depth'])
-
-    menu_dict = skeleton.SKELETON
-    for i in range(0, params.depth + 1):
-        print '# i: ' + str(i)
-        print '# params[id_' + str(i) + ']: ' + params['id_' + str(i)]
-        menu_dict = menu_dict[params['id_' + str(i)]]
-        print '# current_menu_dict: ' + repr(menu_dict)
+    print '# params[menu_dict]: ' + repr(params['menu_dict'])
 
     # First we sort the current menu
     menu = []
-    for item_id in menu_dict:
-        print '# item_id: ' + item_id
+    for item_id in params['menu_dict']:
         # If menu item isn't disable
-        if common.PLUGIN.get_setting(item_id):
-            item_order = common.PLUGIN.get_setting(item_id + '.order')
-            item_title = skeleton.LABELS[item_id]
-            item_folder = skeleton.FOLDERS[item_id]
-            item = (item_order, item_id, item_title, item_folder)
-            menu.append(item)
+        # if common.PLUGIN.get_setting(item_id):
+        item_order = common.PLUGIN.get_setting(item_id + '.order')
+        item_title = skeleton.LABELS[item_id]
+        item_folder = skeleton.FOLDERS[item_id]
+        item = (item_order, item_id, item_title, item_folder)
+        menu.append(item)
 
     menu = sorted(menu, key=lambda x: x[0])
 
@@ -96,6 +90,19 @@ def root(params):
     last_item_id = ''
     for index, (item_order, item_id, item_title, item_folder) \
             in enumerate(menu):
+
+        if params['path'] is None:
+            params['path'] = [item_folder]
+        params_path = params['path'].append(item_folder)
+        params_menu_dict = params['menu_dict'][item_id]
+
+        # DEBUG
+        print '#\t item_id: ' + item_id
+        print '#\t item_folder: ' + item_folder
+        print '#\t item_title: ' + item_title
+        print '#\t params_path: ' + repr(params_path)
+        print '#\t params_menu_dict: ' + repr(params_menu_dict)
+
         last_item_id = item_id
         last_window_title = _(item_title)
 
@@ -158,10 +165,10 @@ def root(params):
             # 'fanart': fanart,
             'label': _(item_title),
             'url': common.PLUGIN.get_url(
-                action='list_channels',
+                action='root',
                 item_id=item_id,
-                item_folder=item_folder,
-                depth=params.depth + 1,
+                path=repr(params_path),
+                menu_dict=repr(params_menu_dict),
                 window_title=_(item_title)
             ),
             'context_menu': context_menu
