@@ -61,50 +61,55 @@ def root(params):
     with all not hidden categories
     """
 
-    print '# Enter in root(params)'
-
     # If we just launch the addon
     if 'menu_dict' not in params:
-        params['menu_dict'] = skeleton.SKELETON
-        params['path'] = []
+        params['menu_dict'] = skeleton.SKELETON['root']
+        params['path_folder'] = ['root']
+        params['path_kodi'] = 'root'
     else:
         params['menu_dict'] = eval(params['menu_dict'])
-        params['path'] = eval(params['path'])
-
-    print '# params[menu_dict]: ' + repr(params['menu_dict'])
+        params['path_folder'] = eval(params['path_folder'])
 
     # First we sort the current menu
     menu = []
     for item_id in params['menu_dict']:
         # If menu item isn't disable
-        # if common.PLUGIN.get_setting(item_id):
-        item_order = common.PLUGIN.get_setting(item_id + '.order')
-        item_title = skeleton.LABELS[item_id]
-        item_folder = skeleton.FOLDERS[item_id]
-        item = (item_order, item_id, item_title, item_folder)
-        menu.append(item)
+        if common.PLUGIN.get_setting(item_id):
+            item_order = common.PLUGIN.get_setting(item_id + '.order')
+
+            try:
+                item_title = common.PLUGIN.get_localized_string(
+                    skeleton.LABELS[item_id])
+            except TypeError:
+                item_title = skeleton.LABELS[item_id]
+
+            item_folder = ''
+            item_next = 'module_entry'
+            if isinstance(params['menu_dict'], dict):
+                item_folder = skeleton.FOLDERS[item_id]
+                item_next = 'root'
+
+            item = (item_order, item_id, item_title, item_folder, item_next)
+            menu.append(item)
 
     menu = sorted(menu, key=lambda x: x[0])
 
     listing = []
     last_item_id = ''
-    for index, (item_order, item_id, item_title, item_folder) \
+    for index, (item_order, item_id, item_title, item_folder, item_next) \
             in enumerate(menu):
 
-        if params['path'] is None:
-            params['path'] = [item_folder]
-        params_path = params['path'].append(item_folder)
-        params_menu_dict = params['menu_dict'][item_id]
+        params_menu_dict = params['menu_dict']
+        if isinstance(params['menu_dict'], dict):
+            params_menu_dict = params['menu_dict'][item_id]
 
-        # DEBUG
-        print '#\t item_id: ' + item_id
-        print '#\t item_folder: ' + item_folder
-        print '#\t item_title: ' + item_title
-        print '#\t params_path: ' + repr(params_path)
-        print '#\t params_menu_dict: ' + repr(params_menu_dict)
+        params_path_folder = params['path_folder'][:]
+        params_path_folder.append(item_folder)
+
+        params_path_kodi = params['path_kodi'] + '_' + item_id
 
         last_item_id = item_id
-        last_window_title = _(item_title)
+        last_window_title = item_title
 
         # Build context menu (Move up, move down, ...)
         context_menu = []
@@ -141,35 +146,39 @@ def root(params):
                 item_id=item_id) + ')'
         )
         context_menu.append(hide)
-
         context_menu.append(utils.vpn_context_menu_item())
 
-        '''
         media_item_path = common.sp.xbmc.translatePath(
             common.sp.os.path.join(
                 MEDIA_PATH,
-                'categories',
-                category_id[-2:]
+                *(params['path_folder'])
             )
         )
+        media_item_path = media_item_path + common.sp.os.sep
 
-        media_category_path = media_category_path.decode(
+        icon = media_item_path + item_id + '.png'
+        fanart = media_item_path + item_id + '_fanart.jpg'
+
+        icon = icon.decode(
             "utf-8").encode(common.FILESYSTEM_CODING)
 
-        icon = media_category_path + '.png'
-        fanart = media_category_path + '_fanart.jpg'
-        '''
+        fanart = fanart.decode(
+            "utf-8").encode(common.FILESYSTEM_CODING)
+
+        print "#icon : " + icon
+        print "#fanart : " + fanart
 
         listing.append({
-            # 'icon': icon,
-            # 'fanart': fanart,
-            'label': _(item_title),
+            'icon': icon,
+            'fanart': fanart,
+            'label': item_title,
             'url': common.PLUGIN.get_url(
-                action='root',
+                action=item_next,
                 item_id=item_id,
-                path=repr(params_path),
+                path_folder=repr(params_path_folder),
+                path_kodi=repr(params_path_kodi),
                 menu_dict=repr(params_menu_dict),
-                window_title=_(item_title)
+                window_title=item_title
             ),
             'context_menu': context_menu
         })

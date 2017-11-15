@@ -146,190 +146,195 @@ LABELS = {
 
 # SKELETON dictionary corresponds to the different level of menus of the addon
 SKELETON = {
+    'root': {
 
-    'live_tv': {
+        'live_tv': {
 
-        'be': {
-            'rtbf.auvio',
-            'bvn.bvn',
-            'brf.brf',
-            'rtl.rtltvi',
-            'rtl.plugrtl',
-            'rtl.clubrtl'
+            'be': {
+                'rtbf.auvio',
+                'bvn.bvn',
+                'brf.brf',
+                'rtl.rtltvi',
+                'rtl.plugrtl',
+                'rtl.clubrtl'
+            },
+
+            'fr': {
+                'tf1.tf1',
+                'pluzz.france2',
+                'pluzz.france3',
+                'groupecanal.cplus',
+                'pluzz.france5',
+                '6play.m6',
+                'groupecanal.c8',
+                '6play.w9',
+                'tf1.tmc',
+                'tf1.nt1',
+                'nrj.nrj12',
+                'pluzz.france4',
+                'bfmtv.bfmtv',
+                'groupecanal.cnews',
+                'groupecanal.cstar',
+                'gulli.gulli',
+                'pluzz.franceo',
+                'tf1.hd1',
+                'lequipe.lequipe',
+                '6play.6ter',
+                'numero23.numero23',
+                'nrj.cherie25',
+                'pluzz.la_1ere',
+                'pluzz.franceinfo',
+                'bfmtv.bfmbusiness',
+                'bfmtv.rmc',
+                'bfmtv.01net',
+                'tf1.tfou',
+                'tf1.xtra',
+                'tf1.lci',
+                'lcp.lcp',
+                'bfmtv.rmcdecouverte',
+                '6play.stories',
+                '6play.bruce',
+                '6play.crazy_kitchen',
+                '6play.home',
+                '6play.styles',
+                '6play.comedy',
+                'publicsenat.publicsenat',
+                'pluzz.france3regions',
+                'pluzz.francetvsport'
+            },
+
+            'jp': {
+                'nhk.nhknews',
+                'nhk.nhklifestyle',
+                'tbs.tbsnews'
+            },
+
+            'ch': {
+                'srgssr.rts',
+                'srgssr.rsi',
+                'srgssr.srf',
+                'srgssr.rtr',
+                'srgssr.swissinfo'
+            },
+
+            'gb': {
+                'blaze.blaze',
+                'uktvplay.dave',
+                'uktvplay.really',
+                'uktvplay.yesterday',
+                'uktvplay.drama'
+            },
+
+            'wo': {
+                'tv5monde.tv5mondeafrique',
+                'arte.arte',
+                'euronews.euronews',
+                'france24.france24',
+                'nhkworld.nhkworld',
+                'tv5monde.tv5monde',
+                'tv5monde.tivi5monde'
+            }
+
         },
 
-        'fr': {
-            'tf1.tf1',
-            'pluzz.france2',
-            'pluzz.france3',
-            'groupecanal.cplus',
-            'pluzz.france5',
-            '6play.m6',
-            'groupecanal.c8',
-            '6play.w9',
-            'tf1.tmc',
-            'tf1.nt1',
-            'nrj.nrj12',
-            'pluzz.france4',
-            'bfmtv.bfmtv',
-            'groupecanal.cnews',
-            'groupecanal.cstar',
-            'gulli.gulli',
-            'pluzz.franceo',
-            'tf1.hd1',
-            'lequipe.lequipe',
-            '6play.6ter',
-            'numero23.numero23',
-            'nrj.cherie25',
-            'pluzz.la_1ere',
-            'pluzz.franceinfo',
-            'bfmtv.bfmbusiness',
-            'bfmtv.rmc',
-            'bfmtv.01net',
-            'tf1.tfou',
-            'tf1.xtra',
-            'tf1.lci',
-            'lcp.lcp',
-            'bfmtv.rmcdecouverte',
-            '6play.stories',
-            '6play.bruce',
-            '6play.crazy_kitchen',
-            '6play.home',
-            '6play.styles',
-            '6play.comedy',
-            'publicsenat.publicsenat',
-            'pluzz.france3regions',
-            'pluzz.francetvsport'
+        'replay': {
+
+            'be': {
+                'rtbf.auvio',
+                'bvn.bvn',
+                'brf.brf',
+                'rtl.rtltvi',
+                'rtl.plugrtl',
+                'rtl.clubrtl'
+            },
+
+            'fr': {
+                'tf1.tf1',
+                'pluzz.france2',
+                'pluzz.france3',
+                'groupecanal.cplus',
+                'pluzz.france5',
+                '6play.m6',
+                'groupecanal.c8',
+                '6play.w9',
+                'tf1.tmc',
+                'tf1.nt1',
+                'nrj.nrj12',
+                'pluzz.france4',
+                'bfmtv.bfmtv',
+                'groupecanal.cnews',
+                'groupecanal.cstar',
+                'gulli.gulli',
+                'pluzz.franceo',
+                'tf1.hd1',
+                'lequipe.lequipe',
+                '6play.6ter',
+                'numero23.numero23',
+                'nrj.cherie25',
+                'pluzz.la_1ere',
+                'pluzz.franceinfo',
+                'bfmtv.bfmbusiness',
+                'bfmtv.rmc',
+                'bfmtv.01net',
+                'tf1.tfou',
+                'tf1.xtra',
+                'tf1.lci',
+                'lcp.lcp',
+                'bfmtv.rmcdecouverte',
+                '6play.stories',
+                '6play.bruce',
+                '6play.crazy_kitchen',
+                '6play.home',
+                '6play.styles',
+                '6play.comedy',
+                'publicsenat.publicsenat',
+                'pluzz.france3regions',
+                'pluzz.francetvsport'
+            },
+
+            'jp': {
+                'nhk.nhknews',
+                'nhk.nhklifestyle',
+                'tbs.tbsnews'
+            },
+
+            'ch': {
+                'srgssr.rts',
+                'srgssr.rsi',
+                'srgssr.srf',
+                'srgssr.rtr',
+                'srgssr.swissinfo'
+            },
+
+            'gb': {
+                'blaze.blaze',
+                'uktvplay.dave',
+                'uktvplay.really',
+                'uktvplay.yesterday',
+                'uktvplay.drama'
+            },
+
+            'wo': {
+                'tv5monde.tv5mondeafrique',
+                'arte.arte',
+                'euronews.euronews',
+                'france24.france24',
+                'nhkworld.nhkworld',
+                'tv5monde.tv5monde',
+                'tv5monde.tivi5monde'
+            }
+
         },
 
-        'jp': {
-            'nhk.nhknews',
-            'nhk.nhklifestyle',
-            'tbs.tbsnews'
-        },
-
-        'ch': {
-            'srgssr.rts',
-            'srgssr.rsi',
-            'srgssr.srf',
-            'srgssr.rtr',
-            'srgssr.swissinfo'
-        },
-
-        'gb': {
-            'blaze.blaze',
-            'uktvplay.dave',
-            'uktvplay.really',
-            'uktvplay.yesterday',
-            'uktvplay.drama'
-        },
-
-        'wo': {
-            'tv5monde.tv5mondeafrique',
-            'arte.arte',
-            'euronews.euronews',
-            'france24.france24',
-            'nhkworld.nhkworld',
-            'tv5monde.tv5monde',
-            'tv5monde.tivi5monde'
+        'websites': {
+            'allocine',
+            'tetesaclaques',
+            'taratata',
+            'noob',
+            'culturepub'
         }
-
-    },
-
-    'replay': {
-
-        'be': {
-            'rtbf.auvio',
-            'bvn.bvn',
-            'brf.brf',
-            'rtl.rtltvi',
-            'rtl.plugrtl',
-            'rtl.clubrtl'
-        },
-
-        'fr': {
-            'tf1.tf1',
-            'pluzz.france2',
-            'pluzz.france3',
-            'groupecanal.cplus',
-            'pluzz.france5',
-            '6play.m6',
-            'groupecanal.c8',
-            '6play.w9',
-            'tf1.tmc',
-            'tf1.nt1',
-            'nrj.nrj12',
-            'pluzz.france4',
-            'bfmtv.bfmtv',
-            'groupecanal.cnews',
-            'groupecanal.cstar',
-            'gulli.gulli',
-            'pluzz.franceo',
-            'tf1.hd1',
-            'lequipe.lequipe',
-            '6play.6ter',
-            'numero23.numero23',
-            'nrj.cherie25',
-            'pluzz.la_1ere',
-            'pluzz.franceinfo',
-            'bfmtv.bfmbusiness',
-            'bfmtv.rmc',
-            'bfmtv.01net',
-            'tf1.tfou',
-            'tf1.xtra',
-            'tf1.lci',
-            'lcp.lcp',
-            'bfmtv.rmcdecouverte',
-            '6play.stories',
-            '6play.bruce',
-            '6play.crazy_kitchen',
-            '6play.home',
-            '6play.styles',
-            '6play.comedy',
-            'publicsenat.publicsenat',
-            'pluzz.france3regions',
-            'pluzz.francetvsport'
-        },
-
-        'jp': {
-            'nhk.nhknews',
-            'nhk.nhklifestyle',
-            'tbs.tbsnews'
-        },
-
-        'ch': {
-            'srgssr.rts',
-            'srgssr.rsi',
-            'srgssr.srf',
-            'srgssr.rtr',
-            'srgssr.swissinfo'
-        },
-
-        'gb': {
-            'blaze.blaze',
-            'uktvplay.dave',
-            'uktvplay.really',
-            'uktvplay.yesterday',
-            'uktvplay.drama'
-        },
-
-        'wo': {
-            'tv5monde.tv5mondeafrique',
-            'arte.arte',
-            'euronews.euronews',
-            'france24.france24',
-            'nhkworld.nhkworld',
-            'tv5monde.tv5monde',
-            'tv5monde.tivi5monde'
-        }
-
-    },
-
-    'websites': {
-        'allocine',
-        'tetesaclaques',
-        'taratata',
-        'noob',
-        'culturepub'
     }
 }
+
+
+
