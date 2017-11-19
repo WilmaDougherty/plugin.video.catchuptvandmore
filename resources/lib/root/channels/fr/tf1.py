@@ -59,7 +59,27 @@ IMG_WIDTH = 640
 IMG_HEIGHT = 360
 
 
-def channel_entry(params):
+def replay_entry(params):
+    if 'next' not in params:
+        params['next'] = 'list_shows_1'
+        return list_shows(params)
+    else:
+        if 'list_shows' in params.next:
+            return list_shows(params)
+        elif 'list_videos_categories' in params.next:
+            return list_videos_categories(params)
+        elif 'list_videos_lci' in params.next:
+            return list_videos_lci(params)
+        elif 'list_videos' in params.next:
+            return list_videos(params)
+        elif 'live' in params.next:
+            return list_live(params)
+        elif 'play' in params.next:
+            return get_video_url(params)
+        return None
+
+
+def module_entry(params):
     """Entry function of the module"""
     if 'root' in params.next:
         return root(params)
@@ -87,23 +107,23 @@ def root(params):
     modes.append({
         'label': 'Replay',
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='list_shows_1',
-            category='%s Replay' % params.channel_name.upper(),
-            window_title='%s Replay' % params.channel_name
+            category='%s Replay' % params.submodule_name.upper(),
+            window_title='%s Replay' % params.submodule_name
         ),
         'context_menu': context_menu
     })
 
     # Add Live
-    if params.channel_name != 'tfou' and params.channel_name != 'xtra':
+    if params.submodule_name != 'tfou' and params.submodule_name != 'xtra':
         modes.append({
             'label': _('Live TV'),
             'url': common.PLUGIN.get_url(
-                action='channel_entry',
+                action='module_entry',
                 next='live_cat',
-                category='%s Live TV' % params.channel_name.upper(),
-                window_title='%s Live TV' % params.channel_name
+                category='%s Live TV' % params.submodule_name.upper(),
+                window_title='%s Live TV' % params.submodule_name
             ),
             'context_menu': context_menu
         })
@@ -123,11 +143,11 @@ def list_shows(params):
     """Build categories listing"""
     shows = []
 
-    if params.channel_name == 'lci':
+    if params.submodule_name == 'lci':
 
         file_path = utils.download_catalog(
             URL_LCI_REPLAY,
-            params.channel_name + '.html')
+            params.submodule_name + '.html')
         root_html = open(file_path).read()
         root_soup = bs(root_html, 'html.parser')
 
@@ -153,7 +173,7 @@ def list_shows(params):
                     'label': program_name,
                     'thumb': img,
                     'url': common.PLUGIN.get_url(
-                        action='channel_entry',
+                        action='module_entry',
                         program_url=program_url,
                         next='list_videos_lci',
                         window_title=program_name
@@ -163,11 +183,11 @@ def list_shows(params):
     else:
         url = ''.join((
             URL_ROOT,
-            params.channel_name,
+            params.submodule_name,
             '/programmes-tv'))
         file_path = utils.download_catalog(
             url,
-            params.channel_name + '.html')
+            params.submodule_name + '.html')
         root_html = open(file_path).read()
         root_soup = bs(root_html, 'html.parser')
 
@@ -182,7 +202,7 @@ def list_shows(params):
                 shows.append({
                     'label': category_name,
                     'url': common.PLUGIN.get_url(
-                        action='channel_entry',
+                        action='module_entry',
                         category=category_url,
                         next='list_shows_2',
                         window_title=category_name
@@ -217,7 +237,7 @@ def list_shows(params):
                             'label': program_name,
                             'thumb': img,
                             'url': common.PLUGIN.get_url(
-                                action='channel_entry',
+                                action='module_entry',
                                 program_url=program_url,
                                 next='list_videos',
                                 window_title=program_name
@@ -229,7 +249,7 @@ def list_shows(params):
                             'label': program_name,
                             'thumb': img,
                             'url': common.PLUGIN.get_url(
-                                action='channel_entry',
+                                action='module_entry',
                                 program_url=program_url,
                                 next='list_videos_categories',
                                 window_title=program_name
@@ -288,7 +308,7 @@ def list_videos_categories(params):
             videos_categories.append({
                 'label': category_title,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     program_url=params.program_url,
                     page='1',
                     last_page=last_page,
@@ -313,7 +333,7 @@ def list_videos_lci(params):
     """Build videos listing"""
     videos = []
 
-    if params.channel_name == 'lci':
+    if params.submodule_name == 'lci':
         program_html = utils.get_webcontent(params.program_url)
         program_soup = bs(program_html, 'html.parser')
 
@@ -364,7 +384,7 @@ def list_videos_lci(params):
                     'label': title,
                     'thumb': img,
                     'url': common.PLUGIN.get_url(
-                        action='channel_entry',
+                        action='module_entry',
                         next='play_r',
                         program_id=program_id,
                     ),
@@ -429,7 +449,7 @@ def list_videos(params):
             'label': title,
             # 'thumb': img,
             'url': common.PLUGIN.get_url(
-                action='channel_entry',
+                action='module_entry',
                 next='play_r',
                 program_id=program_id,
             ),
@@ -544,7 +564,7 @@ def list_videos(params):
                         'label': title,
                         'thumb': img,
                         'url': common.PLUGIN.get_url(
-                            action='channel_entry',
+                            action='module_entry',
                             next='play_r',
                             program_id=program_id,
                         ),
@@ -558,7 +578,7 @@ def list_videos(params):
             videos.append({
                 'label': common.ADDON.get_localized_string(30100),
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     program_url=params.program_url,
                     category_id=params.category_id,
                     last_page=params.last_page,
@@ -590,8 +610,8 @@ def list_live(params):
     lives = []
 
     file_path = utils.download_catalog(
-        URL_LIVE_INFO % params.channel_name,
-        '%s_info_live.json' % (params.channel_name)
+        URL_LIVE_INFO % params.submodule_name,
+        '%s_info_live.json' % (params.submodule_name)
     )
     file_info_live = open(file_path).read()
     json_parser = json.loads(file_info_live)
@@ -634,7 +654,7 @@ def list_live(params):
         'fanart': img,
         'thumb': img,
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='play_l',
         ),
         'is_playable': True,
@@ -675,7 +695,7 @@ def get_video_url(params):
                 'div',
                 class_='iframe_player')
 
-            if params.channel_name == 'lci':
+            if params.submodule_name == 'lci':
                 video_id = iframe_player_soup['data-watid'].encode('utf-8')
             else:
                 data_src = iframe_player_soup['data-src'].encode('utf-8')
@@ -731,8 +751,8 @@ def get_video_url(params):
 
     elif params.next == 'play_l':
 
-        # Video_ID 'L_%CHANNEL_NAME%'
-        video_id = 'L_%s' % params.channel_name.upper()
+        # Video_ID 'L_%submodule_name%'
+        video_id = 'L_%s' % params.submodule_name.upper()
 
         timeserver = str(utils.get_webcontent(URL_TIME))
 

@@ -74,7 +74,7 @@ URL_LIVE_TV = 'http://replay.gulli.fr/Direct'
 # program_id
 
 
-def channel_entry(params):
+def module_entry(params):
     """Entry function of the module"""
     if 'root' in params.next:
         return root(params)
@@ -107,10 +107,10 @@ def root(params):
     modes.append({
         'label': 'Replay',
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='list_shows_1',
-            category='%s Replay' % params.channel_name.upper(),
-            window_title='%s Replay' % params.channel_name
+            category='%s Replay' % params.submodule_name.upper(),
+            window_title='%s Replay' % params.submodule_name
         ),
         'context_menu': context_menu
     })
@@ -119,10 +119,10 @@ def root(params):
     modes.append({
         'label': 'Live TV',
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='live_cat',
-            category='%s Live TV' % params.channel_name.upper(),
-            window_title='%s Live TV' % params.channel_name
+            category='%s Live TV' % params.submodule_name.upper(),
+            window_title='%s Live TV' % params.submodule_name
         ),
         'context_menu': context_menu
     })
@@ -147,7 +147,7 @@ def list_shows(params):
             shows.append({
                 'label': category_title,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     category_url=category_url % get_api_key(),
                     next='list_shows_cat',
                     title=category_title,
@@ -168,7 +168,7 @@ def list_shows(params):
     elif params.next == 'list_shows_cat':
         file_path = utils.download_catalog(
             params.category_url,
-            '%s_%s.json' % (params.channel_name, params.title),
+            '%s_%s.json' % (params.submodule_name, params.title),
             random_ua=True)
         file = open(file_path).read()
         json_category = json.loads(file)
@@ -183,7 +183,7 @@ def list_shows(params):
                 'thumb': fanart,
                 'fanart': fanart,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     program_id=program_id,
                     next='list_videos',
                     title=program_title,
@@ -209,7 +209,7 @@ def list_videos(params):
 
     file_path = utils.download_catalog(
         URL_LIST_SHOW % (get_api_key(), params.program_id),
-        '%s_%s.json' % (params.channel_name, params.program_id))
+        '%s_%s.json' % (params.submodule_name, params.program_id))
     file = open(file_path).read()
     json_show = json.loads(file)
 
@@ -266,7 +266,7 @@ def list_videos(params):
             'thumb': thumb,
             'fanart': fanart,
             'url': common.PLUGIN.get_url(
-                action='channel_entry',
+                action='module_entry',
                 next='play_r',
                 url_streaming=url_streaming
             ),
@@ -300,7 +300,7 @@ def list_live(params):
 
     file_path = utils.download_catalog(
         URL_LIVE_TV,
-        params.channel_name + '_live.html')
+        params.submodule_name + '_live.html')
     root_live_html = open(file_path).read()
     root_live_soup = bs(root_live_html, 'html.parser')
 
@@ -315,7 +315,7 @@ def list_live(params):
 
     file_path_2 = utils.download_catalog(
         url_live_embeded,
-        params.channel_name + '_live_embeded.html')
+        params.submodule_name + '_live_embeded.html')
     root_live_embeded_html = open(file_path_2).read()
 
     all_url_video = re.compile(
@@ -325,7 +325,7 @@ def list_live(params):
         if url_video.count('m3u8') > 0:
             url_live = url_video
 
-    title = '%s Live' % params.channel_name.upper()
+    title = '%s Live' % params.submodule_name.upper()
 
     info = {
         'video': {
@@ -340,7 +340,7 @@ def list_live(params):
         'fanart': img,
         'thumb': img,
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='play_l',
             url_live=url_live,
         ),

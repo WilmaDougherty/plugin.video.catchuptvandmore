@@ -45,7 +45,7 @@ URL_LIVE_SITE = 'https://www.publicsenat.fr/direct'
 URL_DAILYMOTION_EMBED = 'http://www.dailymotion.com/embed/video/%s'
 
 
-def channel_entry(params):
+def module_entry(params):
     """Entry function of the module"""
     if 'root' in params.next:
         return root(params)
@@ -94,10 +94,10 @@ def root(params):
     modes.append({
         'label': 'Replay',
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='list_shows_1',
-            category='%s Replay' % params.channel_name.upper(),
-            window_title='%s Replay' % params.channel_name
+            category='%s Replay' % params.submodule_name.upper(),
+            window_title='%s Replay' % params.submodule_name
         ),
         'context_menu': context_menu
     })
@@ -106,10 +106,10 @@ def root(params):
     modes.append({
         'label': 'Live TV',
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='live_cat',
-            category='%s Live TV' % params.channel_name.upper(),
-            window_title='%s Live TV' % params.channel_name
+            category='%s Live TV' % params.submodule_name.upper(),
+            window_title='%s Live TV' % params.submodule_name
         ),
         'context_menu': context_menu
     })
@@ -136,7 +136,7 @@ def list_shows(params):
             shows.append({
                 'label': category_name,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     category_url=category_url,
                     category_name=category_name,
                     page='0',
@@ -169,7 +169,7 @@ def list_videos(params):
     file_path = utils.download_catalog(
         url,
         '%s_%s_%s.html' % (
-            params.channel_name,
+            params.submodule_name,
             params.category_name,
             params.page))
     root_html = open(file_path).read()
@@ -342,7 +342,7 @@ def list_videos(params):
                 'thumb': img,
                 'fanart': img,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     next='play_r',
                     url_video=url_video
                 ),
@@ -355,7 +355,7 @@ def list_videos(params):
     videos.append({
         'label': common.ADDON.get_localized_string(30100),
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             category_url=params.category_url,
             category_name=params.category_name,
             next='list_videos_1',
@@ -400,7 +400,7 @@ def list_live(params):
 
     url_live = live_soup.find('iframe').get('src')
 
-    title = '%s Live' % params.channel_name.upper()
+    title = '%s Live' % params.submodule_name.upper()
 
     info = {
         'video': {
@@ -415,7 +415,7 @@ def list_live(params):
         'fanart': img,
         'thumb': img,
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='play_l',
             url=url_live,
         ),

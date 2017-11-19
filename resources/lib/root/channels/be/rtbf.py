@@ -59,7 +59,7 @@ URL_JSON_LIVE = 'https://www.rtbf.be/api/partner/generic/live/' \
 URL_ROOT_LIVE = 'https://www.rtbf.be/auvio/direct#/'
 
 
-def channel_entry(params):
+def module_entry(params):
     """Entry function of the module"""
     if 'root' in params.next:
         return root(params)
@@ -79,7 +79,7 @@ def get_partener_key(params):
 
     file_path_root_live = utils.download_catalog(
         URL_ROOT_LIVE,
-        '%s_root_live.html' % params.channel_name,
+        '%s_root_live.html' % params.submodule_name,
     )
     html_root_live = open(file_path_root_live).read()
 
@@ -94,7 +94,7 @@ def get_partener_key(params):
         # Get partener key
         file_path_js = utils.download_catalog(
             js_file,
-            '%s_partener_key_%s.js' % (params.channel_name, str(i)),
+            '%s_partener_key_%s.js' % (params.submodule_name, str(i)),
         )
         partener_key_js = open(file_path_js).read()
 
@@ -127,10 +127,10 @@ def root(params):
     modes.append({
         'label': 'Replay',
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='list_shows_1',
-            category='%s Replay' % params.channel_name.upper(),
-            window_title='%s Replay' % params.channel_name
+            category='%s Replay' % params.submodule_name.upper(),
+            window_title='%s Replay' % params.submodule_name
         ),
         'context_menu': context_menu
     })
@@ -139,10 +139,10 @@ def root(params):
     modes.append({
         'label': _('Live TV'),
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='live_cat',
-            category='%s Live TV' % params.channel_name.upper(),
-            window_title='%s Live TV' % params.channel_name
+            category='%s Live TV' % params.submodule_name.upper(),
+            window_title='%s Live TV' % params.submodule_name
         ),
         'context_menu': context_menu
     })
@@ -169,7 +169,7 @@ def list_shows(params):
             'label': emission_title,
             'url': common.PLUGIN.get_url(
                 emission_title=emission_title,
-                action='channel_entry',
+                action='module_entry',
                 next='list_shows_2',
                 window_title=emission_title
             ),
@@ -189,7 +189,7 @@ def list_shows(params):
                         shows.append({
                             'label': category_name,
                             'url': common.PLUGIN.get_url(
-                                action='channel_entry',
+                                action='module_entry',
                                 category_url=category_url,
                                 category_name=category_name,
                                 next='list_videos_categorie',
@@ -217,7 +217,7 @@ def list_shows(params):
                 'label': emission_title,
                 'url': common.PLUGIN.get_url(
                     emission_title=emission_title,
-                    action='channel_entry',
+                    action='module_entry',
                     emission_id=emission_id,
                     next='list_videos_emission',
                     window_title=emission_title
@@ -302,7 +302,7 @@ def list_videos(params):
                 'thumb': img,
                 'fanart': img,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     next='play_r',
                     url_video=url_video
                 ),
@@ -364,7 +364,7 @@ def list_videos(params):
                     'thumb': img,
                     'fanart': img,
                     'url': common.PLUGIN.get_url(
-                        action='channel_entry',
+                        action='module_entry',
                         next='play_r_categorie',
                         video_id=video_id
                     ),
@@ -398,7 +398,7 @@ def list_live(params):
 
     file_path = utils.download_catalog(
         URL_JSON_LIVE % (get_partener_key(params)),
-        '%s_live.json' % (params.channel_name))
+        '%s_live.json' % (params.submodule_name))
     live_json = open(file_path).read()
     live_jsonparser = json.loads(live_json)
 
@@ -437,7 +437,7 @@ def list_live(params):
             'fanart': img,
             'thumb': img,
             'url': common.PLUGIN.get_url(
-                action='channel_entry',
+                action='module_entry',
                 next='play_l',
                 url_live=url_live,
             ),

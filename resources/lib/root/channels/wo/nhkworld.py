@@ -40,31 +40,31 @@ context_menu.append(utils.vpn_context_menu_item())
 URL_ROOT = 'http://www3.nhk.or.jp/'
 
 URL_LIVE_NHK = 'http://www3.nhk.or.jp/%s/app/tv/hlslive_tv.xml'
-# Channel_Name...
+# submodule_name...
 
 URL_COMMONJS_NHK = 'http://www3.nhk.or.jp/%s/common/js/common.js'
-# Channel_Name...
+# submodule_name...
 
 URL_LIVE_INFO_NHK = 'https://api.nhk.or.jp/%s/epg/v6/%s/now.json?apikey=%s'
-# Channel_Name, location, apikey ...
+# submodule_name, location, apikey ...
 
 URL_CATEGORIES_NHK = 'https://api.nhk.or.jp/%s/vodcatlist/v2/notzero/list.json?apikey=%s'
-# Channel_Name, apikey
+# submodule_name, apikey
 
 URL_ALL_VOD_NHK = 'https://api.nhk.or.jp/%s/vodesdlist/v1/all/all/all.json?apikey=%s'
-# Channel_Name, apikey
+# submodule_name, apikey
 
 URL_VIDEO_VOD = 'https://player.ooyala.com/sas/player_api/v2/authorization/' \
                 'embed_code/%s/%s?device=html5&domain=www3.nhk.or.jp'
 # pcode, Videoid
 
 URL_GET_JS_PCODE = 'https://www3.nhk.or.jp/%s/common/player/tv/vod/'
-# Channel_Name...
+# submodule_name...
 
 LOCATION = ['world']
 
 
-def channel_entry(params):
+def module_entry(params):
     """Entry function of the module"""
     if 'root' in params.next:
         return root(params)
@@ -82,8 +82,8 @@ def channel_entry(params):
 def get_pcode(params):
     # Get js file
     file_path = utils.download_catalog(
-        URL_GET_JS_PCODE % params.channel_name,
-        '%s_js.html' % params.channel_name,
+        URL_GET_JS_PCODE % params.submodule_name,
+        '%s_js.html' % params.submodule_name,
     )
     file_js = open(file_path).read()
     js_file = re.compile('<script src="\/(.+?)"').findall(file_js)
@@ -94,7 +94,7 @@ def get_pcode(params):
     # Get apikey
     file_path_js = utils.download_catalog(
         url_get_pcode,
-        '%s_pcode.js' % params.channel_name,
+        '%s_pcode.js' % params.submodule_name,
     )
     pcode_js = open(file_path_js).read()
     pcode = re.compile('pcode: "(.+?)"').findall(pcode_js)
@@ -104,8 +104,8 @@ def get_pcode(params):
 def get_api_key(params):
     # Get apikey
     file_path_js = utils.download_catalog(
-        URL_COMMONJS_NHK % params.channel_name,
-        '%s_info.js' % params.channel_name,
+        URL_COMMONJS_NHK % params.submodule_name,
+        '%s_info.js' % params.submodule_name,
     )
     info_js = open(file_path_js).read()
 
@@ -121,10 +121,10 @@ def root(params):
     modes.append({
         'label': 'Replay',
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='list_shows_1',
-            category='%s Replay' % params.channel_name.upper(),
-            window_title='%s Replay' % params.channel_name
+            category='%s Replay' % params.submodule_name.upper(),
+            window_title='%s Replay' % params.submodule_name
         ),
         'context_menu': context_menu
     })
@@ -133,10 +133,10 @@ def root(params):
     modes.append({
         'label': _('Live TV'),
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='live_cat',
-            category='%s Live TV' % params.channel_name.upper(),
-            window_title='%s Live TV' % params.channel_name
+            category='%s Live TV' % params.submodule_name.upper(),
+            window_title='%s Live TV' % params.submodule_name
         ),
         'context_menu': context_menu
     })
@@ -162,7 +162,7 @@ def list_shows(params):
         shows.append({
             'label': all_video,
             'url': common.PLUGIN.get_url(
-                action='channel_entry',
+                action='module_entry',
                 next='list_videos_cat',
                 category_id=0,
                 all_video=all_video,
@@ -172,8 +172,8 @@ def list_shows(params):
         })
 
         file_path = utils.download_catalog(
-            URL_CATEGORIES_NHK % (params.channel_name, get_api_key(params)),
-            '%s_categories.json' % (params.channel_name)
+            URL_CATEGORIES_NHK % (params.submodule_name, get_api_key(params)),
+            '%s_categories.json' % (params.submodule_name)
         )
         file_categories = open(file_path).read()
         json_parser = json.loads(file_categories)
@@ -186,7 +186,7 @@ def list_shows(params):
             shows.append({
                 'label': name_category,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     next='list_videos_cat',
                     category_id=category_id,
                     name_category=name_category,
@@ -213,8 +213,8 @@ def list_videos(params):
         category_id = params.category_id
 
         file_path = utils.download_catalog(
-            URL_ALL_VOD_NHK % (params.channel_name, get_api_key(params)),
-            '%s_all_vod.json' % (params.channel_name)
+            URL_ALL_VOD_NHK % (params.submodule_name, get_api_key(params)),
+            '%s_all_vod.json' % (params.submodule_name)
         )
         file_all_vod = open(file_path).read()
         json_parser = json.loads(file_all_vod)
@@ -280,7 +280,7 @@ def list_videos(params):
                     'thumb': img,
                     'fanart': img,
                     'url': common.PLUGIN.get_url(
-                        action='channel_entry',
+                        action='module_entry',
                         next='play_r',
                         video_id=video_id
                     ),
@@ -316,12 +316,12 @@ def list_live(params):
     img = ''
     url_live = ''
 
-    title = '%s Live' % (params.channel_name.upper())
+    title = '%s Live' % (params.submodule_name.upper())
 
     # Get URL Live
     file_path = utils.download_catalog(
-        URL_LIVE_NHK % params.channel_name,
-        '%s_live.xml' % params.channel_name,
+        URL_LIVE_NHK % params.submodule_name,
+        '%s_live.xml' % params.submodule_name,
     )
     live_xml = open(file_path).read()
     xmlElements = ET.XML(live_xml)
@@ -329,11 +329,11 @@ def list_live(params):
 
     # GET Info Live (JSON)
     url_json = URL_LIVE_INFO_NHK % (
-        params.channel_name,
+        params.submodule_name,
         LOCATION[0], get_api_key(params))
     file_path_json = utils.download_catalog(
         url_json,
-        '%s_live.json' % params.channel_name,
+        '%s_live.json' % params.submodule_name,
     )
     live_json = open(file_path_json).read()
     json_parser = json.loads(live_json)
@@ -368,7 +368,7 @@ def list_live(params):
         'fanart': img,
         'thumb': img,
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='play_l',
             url=url_live,
         ),
@@ -394,7 +394,7 @@ def get_video_url(params):
         url = ''
         file_path = utils.download_catalog(
             URL_VIDEO_VOD % (get_pcode(params), params.video_id),
-            '%s_%s_video_vod.json' % (params.channel_name, params.video_id)
+            '%s_%s_video_vod.json' % (params.submodule_name, params.video_id)
         )
         video_vod = open(file_path).read()
         json_parser = json.loads(video_vod)

@@ -59,7 +59,7 @@ URL_VIDEO_REPLAY = 'https://ida.omroep.nl/app.php/%s?adaptive=yes&token=%s'
 # Id Video, Token
 
 
-def channel_entry(params):
+def module_entry(params):
     """Entry function of the module"""
     if 'root' in params.next:
         return root(params)
@@ -84,10 +84,10 @@ def root(params):
     modes.append({
         'label': 'Replay',
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='list_shows_1',
-            category='%s Replay' % params.channel_name.upper(),
-            window_title='%s Replay' % params.channel_name
+            category='%s Replay' % params.submodule_name.upper(),
+            window_title='%s Replay' % params.submodule_name
         ),
         'context_menu': context_menu
     })
@@ -96,10 +96,10 @@ def root(params):
     modes.append({
         'label': 'Live TV',
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='live_cat',
-            category='%s Live TV' % params.channel_name.upper(),
-            window_title='%s Live TV' % params.channel_name
+            category='%s Live TV' % params.submodule_name.upper(),
+            window_title='%s Live TV' % params.submodule_name
         ),
         'context_menu': context_menu
     })
@@ -122,7 +122,7 @@ def list_shows(params):
     if params.next == 'list_shows_1':
         file_path = utils.download_catalog(
             URL_PROGRAMS,
-            '%s_programs.html' % params.channel_name)
+            '%s_programs.html' % params.submodule_name)
         programs_html = open(file_path).read()
 
         programs_soup = bs(programs_html, 'html.parser')
@@ -152,7 +152,7 @@ def list_shows(params):
                 'thumb': category_img,
                 'fanart': category_img,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     next='list_videos_cat',
                     category_url=category_url,
                     window_title=category_name,
@@ -178,7 +178,7 @@ def list_videos(params):
 
     file_path_2 = utils.download_catalog(
         params.category_url,
-        '%s_%s_list_episodes.html' % (params.channel_name, params.category_url))
+        '%s_%s_list_episodes.html' % (params.submodule_name, params.category_url))
     episodes_html = open(file_path_2).read()
 
     episodes_soup = bs(episodes_html, 'html.parser')
@@ -194,7 +194,7 @@ def list_videos(params):
         # get token
         file_path_json_token = utils.download_catalog(
             URL_TOKEN,
-            '%s_replay_token.json' % (params.channel_name))
+            '%s_replay_token.json' % (params.submodule_name))
         replay_json_token = open(file_path_json_token).read()
 
         replay_jsonparser_token = json.loads(replay_json_token)
@@ -203,7 +203,7 @@ def list_videos(params):
         # get info replay
         file_path_info_replay = utils.download_catalog(
             URL_INFO_REPLAY % (id_episode, str(time.time()).replace('.', '')),
-            '%s_%s_info_replay.js' % (params.channel_name, id_episode))
+            '%s_%s_info_replay.js' % (params.submodule_name, id_episode))
         info_replay_js = open(file_path_info_replay).read()
 
         info_replay_json = re.compile(r'\((.*?)\)\n').findall(info_replay_js)[0]
@@ -231,7 +231,7 @@ def list_videos(params):
         # Get HLS link
         file_path_video_replay = utils.download_catalog(
             URL_VIDEO_REPLAY % (id_episode, token),
-            '%s_%s_video_replay.js' % (params.channel_name, id_episode))
+            '%s_%s_video_replay.js' % (params.submodule_name, id_episode))
         video_replay_json = open(file_path_video_replay).read()
 
         video_replay_jsonparser = json.loads(video_replay_json)
@@ -244,7 +244,7 @@ def list_videos(params):
             file_path_hls_replay = utils.download_catalog(
                 url_json_url_hls + \
                 'jsonpCallback%s5910' % (str(time.time()).replace('.', '')),
-                '%s_%s_hls_replay.js' % (params.channel_name, id_episode))
+                '%s_%s_hls_replay.js' % (params.submodule_name, id_episode))
             hls_replay_js = open(file_path_hls_replay).read()
             hls_replay_json = re.compile(r'\((.*?)\)').findall(hls_replay_js)[0]
             hls_replay_jsonparser = json.loads(hls_replay_json)
@@ -283,7 +283,7 @@ def list_videos(params):
                 'thumb': img,
                 'fanart': img,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     next='play_r',
                     url_hls=url_hls
                 ),
@@ -321,28 +321,28 @@ def list_live(params):
 
     file_path = utils.download_catalog(
         URL_LIVE_SITE,
-        '%s_live.html' % (params.channel_name))
+        '%s_live.html' % (params.submodule_name))
     live_html = open(file_path).read()
     id_value = re.compile(r'<script id="(.*?)"').findall(live_html)[0].split('_')
 
     # json with hls
     file_path_json = utils.download_catalog(
         JSON_LIVE % (id_value[0], id_value[1], id_value[2]),
-        '%s_live.json' % (params.channel_name))
+        '%s_live.json' % (params.submodule_name))
     live_json = open(file_path_json).read()
     live_jsonparser = json.loads(live_json)
 
     # json with token
     file_path_json_token = utils.download_catalog(
         JSON_LIVE_TOKEN % (id_value[0], id_value[1], id_value[2]),
-        '%s_live_token.json' % (params.channel_name))
+        '%s_live_token.json' % (params.submodule_name))
     live_json_token = open(file_path_json_token).read()
     live_jsonparser_token = json.loads(live_json_token)
 
     url_live = 'http:' + live_jsonparser["hls"].encode('utf-8') + \
         live_jsonparser_token["token"].encode('utf-8')
 
-    title = '%s Live' % params.channel_name.upper()
+    title = '%s Live' % params.submodule_name.upper()
 
     info = {
         'video': {
@@ -357,7 +357,7 @@ def list_live(params):
         'fanart': img,
         'thumb': img,
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='play_l',
             url_live=url_live,
         ),

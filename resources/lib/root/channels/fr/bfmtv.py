@@ -91,9 +91,9 @@ _ = common.ADDON.initialize_gettext()
 
 
 @common.PLUGIN.mem_cached(common.CACHE_TIME)
-def get_token(channel_name):
+def get_token(submodule_name):
     """Get session token"""
-    file_token = utils.get_webcontent(URL_TOKEN % (channel_name))
+    file_token = utils.get_webcontent(URL_TOKEN % (submodule_name))
     token_json = json.loads(file_token)
     return token_json['session']['token'].encode('utf-8')
 
@@ -106,7 +106,7 @@ def get_policy_key(data_account, data_player):
     return re.compile('policyKey:"(.+?)"').findall(file_js)[0]
 
 
-def channel_entry(params):
+def module_entry(params):
     """Entry function of the module"""
     if 'root' in params.next:
         return root(params)
@@ -130,23 +130,23 @@ def root(params):
     modes.append({
         'label': 'Replay',
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='list_shows_1',
-            category='%s Replay' % params.channel_name.upper(),
-            window_title='%s Replay' % params.channel_name
+            category='%s Replay' % params.submodule_name.upper(),
+            window_title='%s Replay' % params.submodule_name
         ),
         'context_menu': context_menu
     })
 
     # Add Live
-    if params.channel_name != '01net':
+    if params.submodule_name != '01net':
         modes.append({
             'label': 'Live TV',
             'url': common.PLUGIN.get_url(
-                action='channel_entry',
+                action='module_entry',
                 next='live_cat',
-                category='%s Live TV' % params.channel_name.upper(),
-                window_title='%s Live TV' % params.channel_name
+                category='%s Live TV' % params.submodule_name.upper(),
+                window_title='%s Live TV' % params.submodule_name
             ),
             'context_menu': context_menu
         })
@@ -166,11 +166,11 @@ def list_shows(params):
     """Build categories listing"""
     shows = []
 
-    if params.channel_name == 'rmcdecouverte':
+    if params.submodule_name == 'rmcdecouverte':
 
         file_path = utils.download_catalog(
             URL_REPLAY_RMCDECOUVERTE,
-            '%s_replay.html' % (params.channel_name))
+            '%s_replay.html' % (params.submodule_name))
         program_html = open(file_path).read()
 
         program_soup = bs(program_html, 'html.parser')
@@ -197,7 +197,7 @@ def list_shows(params):
                 'label': video_title,
                 'thumb': video_img,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     next='list_videos_1',
                     video_id=video_id,
                     title=video_title,
@@ -211,8 +211,8 @@ def list_shows(params):
         if params.next == 'list_shows_1':
             file_path = utils.download_catalog(
                 URL_REPLAY % (
-                    params.channel_name, get_token(params.channel_name)),
-                '%s.json' % (params.channel_name))
+                    params.submodule_name, get_token(params.submodule_name)),
+                '%s.json' % (params.submodule_name))
             file_categories = open(file_path).read()
             json_categories = json.loads(file_categories)
             json_categories = json_categories['page']['contents'][0]
@@ -227,7 +227,7 @@ def list_shows(params):
                     'label': title,
                     'thumb': image_url,
                     'url': common.PLUGIN.get_url(
-                        action='channel_entry',
+                        action='module_entry',
                         category=category,
                         next='list_videos_1',
                         title=title,
@@ -252,10 +252,10 @@ def list_videos(params):
     """Build videos listing"""
     videos = []
 
-    if params.channel_name == 'rmcdecouverte':
+    if params.submodule_name == 'rmcdecouverte':
         file_path = utils.download_catalog(
             URL_VIDEO_HTML_RMCDECOUVERTE % (params.video_id),
-            '%s_%s_replay.html' % (params.channel_name, params.video_id))
+            '%s_%s_replay.html' % (params.submodule_name, params.video_id))
         video_html = open(file_path).read()
 
         video_soup = bs(video_html, 'html.parser')
@@ -332,7 +332,7 @@ def list_videos(params):
             'thumb': video_img,
             'fanart': video_img,
             'url': common.PLUGIN.get_url(
-                action='channel_entry',
+                action='module_entry',
                 next='play_r',
                 video_url=video_url
             ),
@@ -348,12 +348,12 @@ def list_videos(params):
         if params.next == 'list_videos_1':
             file_path = utils.download_catalog(
                 URL_SHOW % (
-                    params.channel_name,
-                    get_token(params.channel_name),
+                    params.submodule_name,
+                    get_token(params.submodule_name),
                     params.category,
                     params.page),
                 '%s_%s_%s.json' % (
-                    params.channel_name,
+                    params.submodule_name,
                     params.category,
                     params.page))
             file_show = open(file_path).read()
@@ -405,7 +405,7 @@ def list_videos(params):
                     'label': title,
                     'thumb': image,
                     'url': common.PLUGIN.get_url(
-                        action='channel_entry',
+                        action='module_entry',
                         next='play_r',
                         video_id=video_id,
                         video_id_ext=video_id_ext
@@ -419,7 +419,7 @@ def list_videos(params):
             videos.append({
                 'label': common.ADDON.get_localized_string(30100),
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     category=params.category,
                     next='list_videos_1',
                     title=title,
@@ -458,11 +458,11 @@ def list_live(params):
     img = ''
     url_live = ''
 
-    if params.channel_name == 'rmcdecouverte':
+    if params.submodule_name == 'rmcdecouverte':
 
         file_path = utils.download_catalog(
             URL_LIVE_RMCDECOUVERTE,
-            '%s_live.html' % (params.channel_name))
+            '%s_live.html' % (params.submodule_name))
         live_html = open(file_path).read()
 
         live_soup = bs(live_html, 'html.parser')
@@ -505,7 +505,7 @@ def list_live(params):
             'fanart': img,
             'thumb': img,
             'url': common.PLUGIN.get_url(
-                action='channel_entry',
+                action='module_entry',
                 next='play_l',
                 url_live=url_live,
             ),
@@ -516,17 +516,17 @@ def list_live(params):
 
     else:
 
-        if params.channel_name == 'bfmtv':
+        if params.submodule_name == 'bfmtv':
 
             # BFMTV
             file_path = utils.download_catalog(
                 URL_LIVE_BFMTV,
-                '%s_live.html' % (params.channel_name))
+                '%s_live.html' % (params.submodule_name))
             live_html = open(file_path).read()
 
             url_live = re.compile(r'file: \'(.*?)\'').findall(live_html)[0]
 
-            title = '%s Live' % params.channel_name.upper()
+            title = '%s Live' % params.submodule_name.upper()
 
             info = {
                 'video': {
@@ -541,7 +541,7 @@ def list_live(params):
                 'fanart': img,
                 'thumb': img,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     next='play_l',
                     url_live=url_live,
                 ),
@@ -604,7 +604,7 @@ def list_live(params):
                 'fanart': img,
                 'thumb': img,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     next='play_l',
                     url_live=url_live_paris,
                 ),
@@ -613,12 +613,12 @@ def list_live(params):
                 'context_menu': context_menu
             })
 
-        elif params.channel_name == 'bfmbusiness':
+        elif params.submodule_name == 'bfmbusiness':
 
             # BFM BUSINESS
             file_path = utils.download_catalog(
                 URL_LIVE_BFMBUSINESS,
-                '%s_live.html' % (params.channel_name))
+                '%s_live.html' % (params.submodule_name))
             live_html = open(file_path).read()
 
             live_soup = bs(live_html, 'html.parser')
@@ -664,7 +664,7 @@ def list_live(params):
                 'fanart': img,
                 'thumb': img,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     next='play_l',
                     url_live=url_live,
                 ),
@@ -673,7 +673,7 @@ def list_live(params):
                 'context_menu': context_menu
             })
 
-        elif params.channel_name == 'rmc':
+        elif params.submodule_name == 'rmc':
 
             # BFM SPORT
             file_path = utils.download_catalog(
@@ -725,7 +725,7 @@ def list_live(params):
                 'fanart': img,
                 'thumb': img,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     next='play_l',
                     url_live=url_live,
                 ),
@@ -734,7 +734,7 @@ def list_live(params):
                 'context_menu': context_menu
             })
 
-        elif params.channel_name == '01net':
+        elif params.submodule_name == '01net':
 
             # TO DO
 
@@ -754,17 +754,17 @@ def get_video_url(params):
     """Get video URL and start video player"""
     if params.next == 'play_l':
         return params.url_live
-    elif params.channel_name == 'rmcdecouverte' and params.next == 'play_r':
+    elif params.submodule_name == 'rmcdecouverte' and params.next == 'play_r':
         return params.video_url
-    elif params.channel_name == 'rmcdecouverte' and \
+    elif params.submodule_name == 'rmcdecouverte' and \
             params.next == 'download_video':
         return URL_VIDEO_HTML_RMCDECOUVERTE % (params.video_id)
-    elif params.channel_name != 'rmcdecouverte' and \
+    elif params.submodule_name != 'rmcdecouverte' and \
             (params.next == 'play_r' or params.next == 'download_video'):
         file_medias = utils.get_webcontent(
             URL_VIDEO % (
-                params.channel_name,
-                get_token(params.channel_name), params.video_id))
+                params.submodule_name,
+                get_token(params.submodule_name), params.video_id))
         json_parser = json.loads(file_medias)
 
         if params.next == 'download_video':

@@ -51,7 +51,7 @@ URL_API_VOD = 'http://api.france24.com/%s/services/json-rpc/' \
 # language
 
 
-def channel_entry(params):
+def module_entry(params):
     """Entry function of the module"""
     if 'root' in params.next:
         return root(params)
@@ -81,10 +81,10 @@ def root(params):
         modes.append({
             'label': 'Replay',
             'url': common.PLUGIN.get_url(
-                action='channel_entry',
+                action='module_entry',
                 next='list_shows_1',
-                category='%s Replay' % params.channel_name.upper(),
-                window_title='%s Replay' % params.channel_name
+                category='%s Replay' % params.submodule_name.upper(),
+                window_title='%s Replay' % params.submodule_name
             ),
             'context_menu': context_menu
         })
@@ -93,10 +93,10 @@ def root(params):
     modes.append({
         'label': _('Live TV'),
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='live_cat',
-            category='%s Live TV' % params.channel_name.upper(),
-            window_title='%s Live TV' % params.channel_name
+            category='%s Live TV' % params.submodule_name.upper(),
+            window_title='%s Live TV' % params.submodule_name
         ),
         'context_menu': context_menu
     })
@@ -104,12 +104,12 @@ def root(params):
     modes.append({
         'label': 'News - Weather - Business',
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='list_nwb_1',
             category='%s News - Weather - Business' % (
-                params.channel_name.upper()),
+                params.submodule_name.upper()),
             window_title='%s News - Weather - Business' % (
-                params.channel_name)
+                params.submodule_name)
         ),
         'context_menu': context_menu
     })
@@ -137,7 +137,7 @@ def list_shows(params):
             URL_API_VOD % (
                 desired_language.lower(), desired_language.lower()),
             '%s_%s_vod.json' % (
-                params.channel_name, desired_language.lower())
+                params.submodule_name, desired_language.lower())
         )
         json_vod = open(file_path).read()
         json_parser = json.loads(json_vod)
@@ -157,7 +157,7 @@ def list_shows(params):
                 'fanart': img,
                 'thumb': img,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     next='list_videos_cat',
                     nid=nid,
                     url=url,
@@ -187,7 +187,7 @@ def list_videos(params):
 
     file_path = utils.download_catalog(
         URL_API_VOD % (desired_language.lower(), desired_language.lower()),
-        '%s_%s_vod.json' % (params.channel_name, desired_language.lower())
+        '%s_%s_vod.json' % (params.submodule_name, desired_language.lower())
     )
     json_vod = open(file_path).read()
     json_parser = json.loads(json_vod)
@@ -240,7 +240,7 @@ def list_videos(params):
                     'thumb': img,
                     'fanart': img,
                     'url': common.PLUGIN.get_url(
-                        action='channel_entry',
+                        action='module_entry',
                         next='play_r',
                         url=url
                     ),
@@ -280,7 +280,7 @@ def list_live(params):
 
     file_path = utils.download_catalog(
         url_live,
-        '%s_%s_live.html' % (params.channel_name, desired_language.lower())
+        '%s_%s_live.html' % (params.submodule_name, desired_language.lower())
     )
     html_live = open(file_path).read()
     root_soup = bs(html_live, 'html.parser')
@@ -293,7 +293,7 @@ def list_live(params):
         if datas['source']:
             url_live = datas['source']
 
-    title = 'Live ' + params.channel_name + ' ' + desired_language.lower()
+    title = 'Live ' + params.submodule_name + ' ' + desired_language.lower()
 
     info = {
         'video': {
@@ -308,7 +308,7 @@ def list_live(params):
         'fanart': img,
         'thumb': img,
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='play_l',
             url=url_live,
         ),
@@ -399,7 +399,7 @@ def list_nwb(params):
             'fanart': img,
             'thumb': img,
             'url': common.PLUGIN.get_url(
-                action='channel_entry',
+                action='module_entry',
                 next='play_r',
                 url=url_nwb_stream,
             ),

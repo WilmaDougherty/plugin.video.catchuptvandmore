@@ -45,7 +45,7 @@ URL_LIVE_ARTE = 'https://api.arte.tv/api/player/v1/livestream/%s'
 # Langue, ...
 
 
-def channel_entry(params):
+def module_entry(params):
     """Entry function of the module"""
     if 'root' in params.next:
         return root(params)
@@ -69,10 +69,10 @@ def root(params):
     modes.append({
         'label': 'Replay',
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='list_shows_1',
-            category='%s Replay' % params.channel_name.upper(),
-            window_title='%s Replay' % params.channel_name
+            category='%s Replay' % params.submodule_name.upper(),
+            window_title='%s Replay' % params.submodule_name
         ),
         'context_menu': context_menu
     })
@@ -80,10 +80,10 @@ def root(params):
     modes.append({
         'label': 'Live TV',
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='live_cat',
-            category='%s Live TV' % params.channel_name.upper(),
-            window_title='%s Live TV' % params.channel_name
+            category='%s Live TV' % params.submodule_name.upper(),
+            window_title='%s Live TV' % params.submodule_name
         ),
         'context_menu': context_menu
     })
@@ -115,7 +115,7 @@ def list_shows(params):
 
     file_path = utils.download_catalog(
         URL_REPLAY % desired_language,
-        '%s_%s.json' % (params.channel_name, desired_language)
+        '%s_%s.json' % (params.submodule_name, desired_language)
     )
     file_replay = open(file_path).read()
     json_parser = json.loads(file_replay)
@@ -160,7 +160,7 @@ def list_shows(params):
         shows.append({
             'label': category,
             'url': common.PLUGIN.get_url(
-                action='channel_entry',
+                action='module_entry',
                 next='list_videos_cat',
                 category=category,
                 window_title=category
@@ -231,7 +231,7 @@ def list_videos(params):
                     'label': title,
                     'thumb': emission['image'],
                     'url': common.PLUGIN.get_url(
-                        action='channel_entry',
+                        action='module_entry',
                         next='play_r',
                         url=emission['video_url'],
                     ),
@@ -272,7 +272,7 @@ def list_live(params):
 
     file_path = utils.download_catalog(
         URL_LIVE_ARTE % desired_language,
-        '%s_%s_live.json' % (params.channel_name, desired_language)
+        '%s_%s_live.json' % (params.submodule_name, desired_language)
     )
     file_live = open(file_path).read()
     json_parser = json.loads(file_live)
@@ -301,7 +301,7 @@ def list_live(params):
         'fanart': img,
         'thumb': img,
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='play_l',
             url=url_live,
         ),

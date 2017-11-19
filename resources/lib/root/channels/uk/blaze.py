@@ -57,7 +57,7 @@ URL_STREAM = 'https://d2q1b32gh59m9o.cloudfront.net/player/config?' \
 URL_ROOT = 'http://www.blaze.tv'
 
 
-def channel_entry(params):
+def module_entry(params):
     """Entry function of the module"""
     if 'root' in params.next:
         return root(params)
@@ -80,11 +80,11 @@ def root(params):
     modes.append({
         'label': 'Replay',
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='list_shows_1',
             page='0',
-            category='%s Replay' % params.channel_name.upper(),
-            window_title='%s Replay' % params.channel_name
+            category='%s Replay' % params.submodule_name.upper(),
+            window_title='%s Replay' % params.submodule_name
         ),
         'context_menu': context_menu
     })
@@ -93,10 +93,10 @@ def root(params):
     modes.append({
         'label': 'Live TV',
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='live_cat',
-            category='%s Live TV' % params.channel_name.upper(),
-            window_title='%s Live TV' % params.channel_name
+            category='%s Live TV' % params.submodule_name.upper(),
+            window_title='%s Live TV' % params.submodule_name
         ),
         'context_menu': context_menu
     })
@@ -121,7 +121,7 @@ def list_shows(params):
     if params.next == 'list_shows_1':
         file_path = utils.download_catalog(
             URL_SHOWS % params.page,
-            '%s_shows_%s.html' % (params.channel_name, params.page)
+            '%s_shows_%s.html' % (params.submodule_name, params.page)
         )
         replay_shows_html = open(file_path).read()
 
@@ -138,7 +138,7 @@ def list_shows(params):
                 'label': show_title,
                 'thumb': show_img,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     next='list_shows_2',
                     title=show_title,
                     show_url=show_url,
@@ -151,7 +151,7 @@ def list_shows(params):
         shows.append({
             'label': common.ADDON.get_localized_string(30108),
             'url': common.PLUGIN.get_url(
-                action='channel_entry',
+                action='module_entry',
                 next='list_shows_1',
                 page=str(int(params.page) + 1),
                 update_listing=True,
@@ -164,7 +164,7 @@ def list_shows(params):
 
         file_path = utils.download_catalog(
             params.show_url,
-            '%s_show_%s.html' % (params.channel_name, params.title)
+            '%s_show_%s.html' % (params.submodule_name, params.title)
         )
         replay_show_html = open(file_path).read()
 
@@ -182,7 +182,7 @@ def list_shows(params):
             shows.append({
                 'label': season_title,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     next='list_videos_1',
                     title=params.title + '_' + season_title,
                     show_url=show_season_url,
@@ -209,7 +209,7 @@ def list_videos(params):
 
     file_path = utils.download_catalog(
         params.show_url,
-        '%s_show_%s.html' % (params.channel_name, params.title)
+        '%s_show_%s.html' % (params.submodule_name, params.title)
     )
     replay_show_html = open(file_path).read()
     episodes_soup = bs(replay_show_html, 'html.parser')
@@ -265,7 +265,7 @@ def list_videos(params):
             'thumb': video_img,
             'fanart': video_img,
             'url': common.PLUGIN.get_url(
-                action='channel_entry',
+                action='module_entry',
                 next='play_r',
                 video_url=video_url
             ),
@@ -320,7 +320,7 @@ def list_live(params):
         'fanart': img,
         'thumb': img,
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='play_l',
             url=url_live,
         ),

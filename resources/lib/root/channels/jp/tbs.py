@@ -42,7 +42,7 @@ URL_STREAM = 'http://flvstream.tbs.co.jp/flvfiles/_definst_/newsi/digest/%s_1m.m
 
 NEWS_CONTENT = ['nb', '23', 'nst', 'jnn']
 
-def channel_entry(params):
+def module_entry(params):
     """Entry function of the module"""
     if 'root' in params.next:
         return root(params)
@@ -64,7 +64,7 @@ def root(params):
     modes.append({
         'label': 'ニュース',
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='list_videos_news',
             page='1',
             category='TBS ニュース',
@@ -77,7 +77,7 @@ def root(params):
     modes.append({
         'label': '気象',
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='list_videos_weather',
             category='TBS ニュース - 気象',
             window_title='TBS ニュース - 気象'
@@ -143,7 +143,7 @@ def list_videos(params):
             'thumb': img,
             'fanart': img,
             'url': common.PLUGIN.get_url(
-                action='channel_entry',
+                action='module_entry',
                 next='play_r',
                 video_url=video_url
             ),
@@ -193,7 +193,7 @@ def list_videos(params):
                 'thumb': img,
                 'fanart': img,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     next='play_r',
                     video_url=video_url
                 ),

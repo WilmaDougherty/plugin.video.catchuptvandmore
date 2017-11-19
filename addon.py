@@ -57,37 +57,55 @@ _ = common.ADDON.initialize_gettext()
 @common.PLUGIN.action()
 def root(params):
     """
-    Build the addon main menu
+    Build the addon main menus
     with all not hidden categories
     """
 
-    # If we just launch the addon
-    if 'menu_dict' not in params:
-        params['menu_dict'] = skeleton.SKELETON['root']
-        params['path_folder'] = ['root']
-        params['path_kodi'] = 'root'
-    else:
-        params['menu_dict'] = eval(params['menu_dict'])
-        params['path_folder'] = eval(params['path_folder'])
+    # params.module_path --> Path of the module to load
+    # params.skeleton_path --> Path taken by the user in Kodi
+
+    if 'skeleton_path' not in params:
+        # We just launch the addon
+        params.module_path = 'root'
+        params.skeleton_path = 'root'
+
+    current_dict = skeleton.SKELETON
+    for key in params.skeleton_path.split('-'):
+        current_dict = current_dict[key]
 
     # First we sort the current menu
     menu = []
-    for item_id in params['menu_dict']:
+    for item_id in current_dict:
         # If menu item isn't disable
         if common.PLUGIN.get_setting(item_id):
+            # Get order value in settings file
             item_order = common.PLUGIN.get_setting(item_id + '.order')
 
+            # Get english item title in LABELS dict in skeleton file
+            # and check if this title has any translated version
+            item_title = ''
             try:
                 item_title = common.PLUGIN.get_localized_string(
                     skeleton.LABELS[item_id])
             except TypeError:
                 item_title = skeleton.LABELS[item_id]
 
-            item_folder = ''
-            item_next = 'module_entry'
-            if isinstance(params['menu_dict'], dict):
+            # Build step by step the module pathfile
+            item_folder = item_id
+            if item_id in skeleton.FOLDERS:
                 item_folder = skeleton.FOLDERS[item_id]
+
+            # Check the next action to do
+            item_next = ''
+            if isinstance(current_dict, dict):
                 item_next = 'root'
+            elif 'live_tv' in params.skeleton_path:
+                item_next = 'build_live_tv_menu'
+            elif 'replay' in params.skeleton_path:
+                item_next = 'replay_entry'
+            elif 'website' in params.skeleton_path:
+                item_next = 'build_website_menu'
+            # This part can be extended if needed ...
 
             item = (item_order, item_id, item_title, item_folder, item_next)
             menu.append(item)
@@ -95,23 +113,10 @@ def root(params):
     menu = sorted(menu, key=lambda x: x[0])
 
     listing = []
-    last_item_id = ''
     for index, (item_order, item_id, item_title, item_folder, item_next) \
             in enumerate(menu):
 
-        params_menu_dict = params['menu_dict']
-        if isinstance(params['menu_dict'], dict):
-            params_menu_dict = params['menu_dict'][item_id]
-
-        params_path_folder = params['path_folder'][:]
-        params_path_folder.append(item_folder)
-
-        params_path_kodi = params['path_kodi'] + '_' + item_id
-
-        last_item_id = item_id
-        last_window_title = item_title
-
-        # Build context menu (Move up, move down, ...)
+        # Build context menu (Move up, move down, vpn, ...)
         context_menu = []
 
         item_down = (
@@ -148,16 +153,16 @@ def root(params):
         context_menu.append(hide)
         context_menu.append(utils.vpn_context_menu_item())
 
+        # Found icon and fanart images
         media_item_path = common.sp.xbmc.translatePath(
             common.sp.os.path.join(
                 MEDIA_PATH,
-                *(params['path_folder'])
+                *((params.module_path + '-' + item_folder).split('-'))
             )
         )
-        media_item_path = media_item_path + common.sp.os.sep
 
-        icon = media_item_path + item_id + '.png'
-        fanart = media_item_path + item_id + '_fanart.jpg'
+        icon = media_item_path + '.png'
+        fanart = media_item_path + '_fanart.jpg'
 
         icon = icon.decode(
             "utf-8").encode(common.FILESYSTEM_CODING)
@@ -168,6 +173,7 @@ def root(params):
         print "#icon : " + icon
         print "#fanart : " + fanart
 
+        # Append this item to listing
         listing.append({
             'icon': icon,
             'fanart': fanart,
@@ -175,9 +181,8 @@ def root(params):
             'url': common.PLUGIN.get_url(
                 action=item_next,
                 item_id=item_id,
-                path_folder=repr(params_path_folder),
-                path_kodi=repr(params_path_kodi),
-                menu_dict=repr(params_menu_dict),
+                module_path=params.module_path + '-' + item_folder,
+                skeleton_path=params.skeleton_path + '-' + item_id,
                 window_title=item_title
             ),
             'context_menu': context_menu
@@ -185,9 +190,11 @@ def root(params):
 
     # If only one category is present, directly open this category
     if len(listing) == 1:
-        params['item_id'] = last_item_id
-        params['window_title'] = last_window_title
-        return root(params)
+        params['item_id'] = menu[0][1]
+        params['module_path'] = menu[0][1] + '-' + menu[0][1]
+        params['skeleton_path'] = menu[0][1] + '-' + menu[0][1]
+        params['window_title'] = menu[0][1]
+        return eval(menu[0][1] + '(params)')
 
     return common.PLUGIN.create_listing(
         listing,
@@ -197,171 +204,50 @@ def root(params):
     )
 
 
-@common.PLUGIN.action()
-def list_channels(params):
-    """
-    Build the channels list
-    of the desired category
-    """
+def get_module(params):
+    module_path = []
+    module_name = ''
 
-    # First, we sort channels by order
-    channels_dict = skeleton.CHANNELS[params.category_id]
-    channels = []
-    for channel_id, title in channels_dict.iteritems():
-        # If channel isn't disable
-        if common.PLUGIN.get_setting(channel_id):
-            channel_order = common.PLUGIN.get_setting(channel_id + '.order')
-            channel = (channel_order, channel_id, title)
-            channels.append(channel)
+    if 'module_path' in params:
+        for path_part in params['module_path'].split('-'):
+            if '.' in path_part:
+                path_part = path_part.split('.')
+                module_path.append(path_part[0])
+                module_name = path_part[0]
+                params['submodule_name'] = path_part[1]
+            else:
+                module_path.append(path_part)
 
-    channels = sorted(channels, key=lambda x: x[0])
-
-    # Secondly, we build channels list in Kodi
-    listing = []
-    for index, (order, channel_id, title) in enumerate(channels):
-        # channel_id = channels.fr.6play.w9
-        [
-            channel_type,  # channels
-            channel_category,  # fr
-            channel_file,  # 6play
-            channel_name  # w9
-        ] = channel_id.split('.')
-
-        # channel_module = channels.fr.6play
-        channel_module = '.'.join((
-            channel_type,
-            channel_category,
-            channel_file))
-
-        media_channel_path = common.sp.xbmc.translatePath(
-            common.sp.os.path.join(
-                MEDIA_PATH,
-                channel_type,
-                channel_category,
-                channel_name
-            )
-        )
-
-        media_channel_path = media_channel_path.decode(
-            "utf-8").encode(common.FILESYSTEM_CODING)
-
-        # Build context menu (Move up, move down, ...)
-        context_menu = []
-
-        item_down = (
-            _('Move down'),
-            'XBMC.RunPlugin(' + common.PLUGIN.get_url(
-                action='move',
-                direction='down',
-                item_id_order=channel_id + '.order',
-                displayed_items=channels) + ')'
-        )
-        item_up = (
-            _('Move up'),
-            'XBMC.RunPlugin(' + common.PLUGIN.get_url(
-                action='move',
-                direction='up',
-                item_id_order=channel_id + '.order',
-                displayed_items=channels) + ')'
-        )
-
-        if index == 0:
-            context_menu.append(item_down)
-        elif index == len(channels) - 1:
-            context_menu.append(item_up)
-        else:
-            context_menu.append(item_up)
-            context_menu.append(item_down)
-
-        hide = (
-            _('Hide'),
-            'XBMC.RunPlugin(' + common.PLUGIN.get_url(
-                action='hide',
-                item_id=channel_id) + ')'
-        )
-        context_menu.append(hide)
-
-        context_menu.append(utils.vpn_context_menu_item())
-
-        icon = media_channel_path + '.png'
-        fanart = media_channel_path + '_fanart.jpg'
-
-        listing.append({
-            'icon': icon,
-            'fanart': fanart,
-            'label': title,
-            'url': common.PLUGIN.get_url(
-                action='channel_entry',
-                next='root',
-                channel_name=channel_name,
-                channel_module=channel_module,
-                channel_id=channel_id,
-                channel_category=channel_category,
-                window_title=title
-            ),
-            'context_menu': context_menu
-        })
-
-    return common.PLUGIN.create_listing(
-        listing,
-        sort_methods=(
-            common.sp.xbmcplugin.SORT_METHOD_UNSORTED,),
-        category=common.get_window_title()
-    )
-
-
-def get_channel_module(params):
-    if 'channel_name' in params and \
-            'channel_module' in params and \
-            'channel_id' in params and \
-            'channel_category' in params:
-        channel_name = params.channel_name
-        channel_module = params.channel_module
-        channel_id = params.channel_id
-        channel_category = params.channel_category
-        storage = common.sp.MemStorage('last_channel')
-        storage['last_channel_name'] = channel_name
-        storage['last_channel_module'] = channel_module
-        storage['last_channel_id'] = channel_id
-        storage['last_channel_category'] = channel_category
+        storage = common.sp.MemStorage('last_module')
+        storage['module_path'] = module_path
+        storage['module_name'] = module_name
+        storage['submodule_name'] = params['submodule_name']
     else:
-        storage = common.sp.MemStorage('last_channel')
-        channel_name = storage['last_channel_name']
-        channel_module = storage['last_channel_module']
-        channel_id = storage['last_channel_id']
-        channel_category = storage['last_channel_category']
+        storage = common.sp.MemStorage('last_module')
+        module_path = storage['module_path']
+        module_name = storage['module_name']
+        params['submodule_name'] = storage['submodule_name']
 
-    params['channel_name'] = channel_name
-    params['channel_id'] = channel_id
-    params['channel_category'] = channel_category
-
-    channel_path = common.sp.xbmc.translatePath(
+    module_path = common.sp.xbmc.translatePath(
         common.sp.os.path.join(
             LIB_PATH,
-            *(channel_module.split("."))
+            *(module_path)
         )
     )
-    channel_filepath = channel_path + ".py"
-    channel_filepath = channel_filepath.decode(
+    module_filepath = module_path + ".py"
+    module_filepath = module_filepath.decode(
         "utf-8").encode(common.FILESYSTEM_CODING)
 
     return imp.load_source(
-        channel_name,
-        channel_filepath
+        module_name,
+        module_filepath
     )
 
 
 @common.PLUGIN.action()
-def channel_entry(params):
-    """
-    Last plugin action function in addon.py.
-    Now we are going into the channel python file.
-    The channel file can return folder or not item ; playable or not item
-    """
-    channel = get_channel_module(params)
-
-    # Let's go to the channel file ...
-    return channel.channel_entry(params)
+def replay_entry(params):
+    module = get_module(params)
+    return module.replay_entry(params)
 
 
 @common.PLUGIN.action()

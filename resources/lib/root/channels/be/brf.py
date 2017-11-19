@@ -40,7 +40,7 @@ context_menu.append(utils.vpn_context_menu_item())
 URL_ROOT_BRF = 'https://m.brf.be/'
 
 
-def channel_entry(params):
+def module_entry(params):
     """Entry function of the module"""
     if 'root' in params.next:
         return root(params)
@@ -65,10 +65,10 @@ def root(params):
     modes.append({
         'label': 'Replay',
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='list_shows_1',
-            category='%s Replay' % params.channel_name.upper(),
-            window_title='%s Replay' % params.channel_name.upper()
+            category='%s Replay' % params.submodule_name.upper(),
+            window_title='%s Replay' % params.submodule_name.upper()
         ),
         'context_menu': context_menu
     })
@@ -92,7 +92,7 @@ def list_shows(params):
     file_path = utils.download_catalog(
         URL_ROOT_BRF,
         '%s_categories.html' % (
-            params.channel_name))
+            params.submodule_name))
     root_html = open(file_path).read()
     root_soup = bs(root_html, 'html.parser')
 
@@ -108,7 +108,7 @@ def list_shows(params):
             shows.append({
                 'label': category_name,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     category_url=category_url,
                     page='1',
                     category_name=category_name,
@@ -140,7 +140,7 @@ def list_videos(params):
     file_path = utils.download_catalog(
         url_videos,
         '%s_%s_%s.html' % (
-            params.channel_name,
+            params.submodule_name,
             params.category_name,
             params.page))
     root_html = open(file_path).read()
@@ -202,7 +202,7 @@ def list_videos(params):
             'thumb': img,
             'fanart': img,
             'url': common.PLUGIN.get_url(
-                action='channel_entry',
+                action='module_entry',
                 next='play_r',
                 video_url=video_url
             ),
@@ -215,7 +215,7 @@ def list_videos(params):
     videos.append({
         'label': common.ADDON.get_localized_string(30100),
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             category_url=params.category_url,
             category_name=params.category_name,
             next='list_videos',

@@ -59,7 +59,7 @@ URL_STREAM_NHK_LIFE_STYLE = 'http://movie-s.nhk.or.jp/ws/ws_program/api/%s/apiv/
 # Api_Key, VideoId
 
 
-def channel_entry(params):
+def module_entry(params):
     """Entry function of the module"""
     if 'root' in params.next:
         return root(params)
@@ -94,13 +94,13 @@ CORRECT_MONTH = {
 def root(params):
     modes = []
 
-    if params.channel_name == 'nhknews':
+    if params.submodule_name == 'nhknews':
 
         # Add News
         modes.append({
             'label': 'ニュース',
             'url': common.PLUGIN.get_url(
-                action='channel_entry',
+                action='module_entry',
                 next='list_videos_news',
                 page='1',
                 category='NHK ニュース',
@@ -113,7 +113,7 @@ def root(params):
         modes.append({
             'label': '気象',
             'url': common.PLUGIN.get_url(
-                action='channel_entry',
+                action='module_entry',
                 next='list_videos_weather',
                 category='NHK ニュース - 気象',
                 window_title='NHK ニュース - 気象'
@@ -121,7 +121,7 @@ def root(params):
             'context_menu': context_menu
         })
 
-    elif params.channel_name == 'nhklifestyle':
+    elif params.submodule_name == 'nhklifestyle':
 
         # Build Menu
         list_categories_html = utils.get_webcontent(URL_NHK_LIFESTYLE)
@@ -137,7 +137,7 @@ def root(params):
                 modes.append({
                     'label': category_title,
                     'url': common.PLUGIN.get_url(
-                        action='channel_entry',
+                        action='module_entry',
                         next='list_videos_lifestyle',
                         title=category_title,
                         category_url=category_url,
@@ -171,7 +171,7 @@ def list_videos(params):
 
         file_path = utils.download_catalog(
             URL_WEATHER_NHK_NEWS,
-            '%s_weather.json' % (params.channel_name)
+            '%s_weather.json' % (params.submodule_name)
         )
         file_weather = open(file_path).read()
         json_parser = json.loads(file_weather)
@@ -211,7 +211,7 @@ def list_videos(params):
             'thumb': img,
             'fanart': img,
             'url': common.PLUGIN.get_url(
-                action='channel_entry',
+                action='module_entry',
                 next='play_weather_r',
                 video_url=video_url
             ),
@@ -232,7 +232,7 @@ def list_videos(params):
             url = URL_NEWS_NHK_NEWS % params.page
         file_path = utils.download_catalog(
             url,
-            '%s_news_%s.json' % (params.channel_name, params.page)
+            '%s_news_%s.json' % (params.submodule_name, params.page)
         )
         file_news = open(file_path).read()
         json_parser = json.loads(file_news)
@@ -290,7 +290,7 @@ def list_videos(params):
                 'thumb': img,
                 'fanart': img,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     next='play_news_r',
                     video_id=video_id,
                     video_date=video_date
@@ -304,7 +304,7 @@ def list_videos(params):
         videos.append({
             'label': '# ' + common.ADDON.get_localized_string(30100),
             'url': common.PLUGIN.get_url(
-                action='channel_entry',
+                action='module_entry',
                 next='list_videos_news',
                 page=str(int(params.page) + 1),
                 update_listing=True,
@@ -378,7 +378,7 @@ def list_videos(params):
                     'thumb': img,
                     'fanart': img,
                     'url': common.PLUGIN.get_url(
-                        action='channel_entry',
+                        action='module_entry',
                         next='play_lifestyle_r',
                         video_url=video_url
                     ),
@@ -417,7 +417,7 @@ def get_video_url(params):
         url = ''
         file_path = utils.download_catalog(
             URL_STREAM_NEWS % (params.video_date, params.video_id),
-            '%s_%s.json' % (params.channel_name, params.video_id)
+            '%s_%s.json' % (params.submodule_name, params.video_id)
         )
         video_vod = open(file_path).read()
         json_parser = json.loads(video_vod)

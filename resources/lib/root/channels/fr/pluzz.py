@@ -177,21 +177,83 @@ CATEGORIES = {
 }
 
 
-def channel_entry(params):
+def replay_entry(params):
+    modes = []
+
+    if params.submodule_name == 'francetvsport':
+        next_replay = 'list_videos_ftvsport'
+    else:
+        next_replay = 'list_shows_1'
+
+
+    if params.submodule_name != 'franceinfo' and \
+            params.submodule_name != 'france3regions':
+        params['next'] = 'list_shows_1'
+        params['mode'] = 'replay'
+        params['page'] = '1'
+        return list(params)
+
+        modes.append({
+            'label': 'Replay',
+            'url': common.PLUGIN.get_url(
+                action='module_entry',
+                next=next_replay,
+                mode='replay',
+                page='1',
+                category='%s Replay' % params.submodule_name.upper(),
+                window_title='%s Replay' % params.submodule_name
+            ),
+            'context_menu': context_menu
+        })
+
+    # Add Videos
+    if params.submodule_name == 'francetvsport':
+        modes.append({
+            'label': 'Videos',
+            'url': common.PLUGIN.get_url(
+                action='module_entry',
+                next='list_videos_ftvsport',
+                mode='videos',
+                page='1',
+                category='%s Videos' % params.submodule_name.upper(),
+                window_title='%s Videos' % params.submodule_name
+            ),
+            'context_menu': context_menu
+        })
+
+    return common.PLUGIN.create_listing(
+        modes,
+        sort_methods=(
+            common.sp.xbmcplugin.SORT_METHOD_UNSORTED,
+            common.sp.xbmcplugin.SORT_METHOD_LABEL
+        ),
+        category=common.get_window_title()
+    )
+
+
+def module_entry(params):
     """Entry function of the module"""
+    if 'live_tv' in params.steps_path:
+        return list_live(params)
+    elif 'replay' in params.steps_path:
+        print '# REPLAY PLUZ'
+    else:
+        return None
+    '''
     if 'root' in params.next:
         return root(params)
     elif 'list_shows' in params.next:
         return list_shows(params)
     elif 'list_videos' in params.next:
         return list_videos(params)
-    elif 'live' in params.next:
+    elif 'live_tv' in params.next:
         return list_live(params)
     elif 'play' in params.next:
         return get_video_url(params)
     elif 'search' in params.next:
         return search(params)
     return None
+    '''
 
 
 @common.PLUGIN.mem_cached(common.CACHE_TIME)
@@ -207,23 +269,23 @@ def root(params):
     """Add Replay and Live in the listing"""
     modes = []
 
-    if params.channel_name == 'francetvsport':
+    if params.submodule_name == 'francetvsport':
         next_replay = 'list_videos_ftvsport'
     else:
         next_replay = 'list_shows_1'
 
     # Add Replay
-    if params.channel_name != 'franceinfo' and \
-            params.channel_name != 'france3regions':
+    if params.submodule_name != 'franceinfo' and \
+            params.submodule_name != 'france3regions':
         modes.append({
             'label': 'Replay',
             'url': common.PLUGIN.get_url(
-                action='channel_entry',
+                action='module_entry',
                 next=next_replay,
                 mode='replay',
                 page='1',
-                category='%s Replay' % params.channel_name.upper(),
-                window_title='%s Replay' % params.channel_name
+                category='%s Replay' % params.submodule_name.upper(),
+                window_title='%s Replay' % params.submodule_name
             ),
             'context_menu': context_menu
         })
@@ -232,26 +294,26 @@ def root(params):
     modes.append({
         'label': _('Live TV'),
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='live_cat',
             mode='live',
-            category='%s Live TV' % params.channel_name.upper(),
-            window_title='%s Live TV' % params.channel_name
+            category='%s Live TV' % params.submodule_name.upper(),
+            window_title='%s Live TV' % params.submodule_name
         ),
         'context_menu': context_menu
     })
 
     # Add Videos
-    if params.channel_name == 'francetvsport':
+    if params.submodule_name == 'francetvsport':
         modes.append({
             'label': 'Videos',
             'url': common.PLUGIN.get_url(
-                action='channel_entry',
+                action='module_entry',
                 next='list_videos_ftvsport',
                 mode='videos',
                 page='1',
-                category='%s Videos' % params.channel_name.upper(),
-                window_title='%s Videos' % params.channel_name
+                category='%s Videos' % params.submodule_name.upper(),
+                window_title='%s Videos' % params.submodule_name
             ),
             'context_menu': context_menu
         })
@@ -275,8 +337,8 @@ def list_shows(params):
 
     unique_item = dict()
 
-    real_channel = params.channel_name
-    if params.channel_name == 'la_1ere':
+    real_channel = params.submodule_name
+    if params.submodule_name == 'la_1ere':
         real_channel = 'la_1ere_reunion%2C' \
                        'la_1ere_guyane%2C' \
                        'la_1ere_polynesie%2C' \
@@ -294,7 +356,7 @@ def list_shows(params):
         file_path = utils.download_catalog(
             url_json,
             '%s.json' % (
-                params.channel_name))
+                params.submodule_name))
         file_prgm = open(file_path).read()
         json_parser = json.loads(file_prgm)
         emissions = json_parser['reponse']['emissions']
@@ -307,7 +369,7 @@ def list_shows(params):
                 shows.append({
                     'label': rubrique_title,
                     'url': common.PLUGIN.get_url(
-                        action='channel_entry',
+                        action='module_entry',
                         rubrique=rubrique,
                         next='list_shows_2_cat',
                         window_title=rubrique_title
@@ -319,7 +381,7 @@ def list_shows(params):
         shows.append({
             'label': common.ADDON.get_localized_string(30104),
             'url': common.PLUGIN.get_url(
-                action='channel_entry',
+                action='module_entry',
                 next='list_shows_last',
                 page='0',
                 window_title=common.ADDON.get_localized_string(30104)
@@ -331,7 +393,7 @@ def list_shows(params):
         shows.append({
             'label': common.ADDON.get_localized_string(30103),
             'url': common.PLUGIN.get_url(
-                action='channel_entry',
+                action='module_entry',
                 next='search',
                 page='0',
                 window_title=common.ADDON.get_localized_string(30103)
@@ -343,7 +405,7 @@ def list_shows(params):
         shows.append({
             'label': common.ADDON.get_localized_string(30105),
             'url': common.PLUGIN.get_url(
-                action='channel_entry',
+                action='module_entry',
                 next='list_shows_from_a_to_z',
                 window_title=common.ADDON.get_localized_string(30105)
             ),
@@ -355,7 +417,7 @@ def list_shows(params):
         shows.append({
             'label': common.ADDON.get_localized_string(30106),
             'url': common.PLUGIN.get_url(
-                action='channel_entry',
+                action='module_entry',
                 next='list_shows_2_from_a_to_z_CATEGORIES',
                 page='0',
                 url=URL_ALPHA % ('asc', '%s'),
@@ -368,7 +430,7 @@ def list_shows(params):
         shows.append({
             'label': common.ADDON.get_localized_string(30107),
             'url': common.PLUGIN.get_url(
-                action='channel_entry',
+                action='module_entry',
                 next='list_shows_2_from_a_to_z_CATEGORIES',
                 page='0',
                 url=URL_ALPHA % ('desc', '%s'),
@@ -383,11 +445,11 @@ def list_shows(params):
     elif 'list_shows_last' in params.next:
         for title, url in CATEGORIES.iteritems():
             if 'Toutes catégories' in title:
-                url = url % (params.channel_name, '%s')
+                url = url % (params.submodule_name, '%s')
             shows.append({
                 'label': title,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     next='list_videos_last',
                     page='0',
                     url=url,
@@ -404,13 +466,13 @@ def list_shows(params):
             file_path = utils.download_catalog(
                 url_json,
                 '%s.json' % (
-                    params.channel_name))
+                    params.submodule_name))
         elif 'list_shows_2_from_a_to_z_CATEGORIES' in params.next:
             url_json = URL_ALPHA % (params.sens, params.page)
             file_path = utils.download_catalog(
                 url_json,
                 '%s_%s_%s_alpha.json' % (
-                    params.channel_name,
+                    params.submodule_name,
                     params.sens,
                     params.page))
 
@@ -421,7 +483,7 @@ def list_shows(params):
             rubrique = emission['rubrique'].encode('utf-8')
             chaine_id = emission['chaine_id'].encode('utf-8')
             if ('from_a_to_z' in params.next and
-                    chaine_id == params.channel_name) or \
+                    chaine_id == params.submodule_name) or \
                     rubrique == params.rubrique:
                 titre_programme = emission['titre_programme'].encode('utf-8')
                 if titre_programme != '':
@@ -446,7 +508,7 @@ def list_shows(params):
                             'thumb': icon,
                             'fanart': icon,
                             'url': common.PLUGIN.get_url(
-                                action='channel_entry',
+                                action='module_entry',
                                 next='list_videos_1',
                                 id_programme=id_programme,
                                 search=False,
@@ -462,7 +524,7 @@ def list_shows(params):
             shows.append({
                 'label': common.ADDON.get_localized_string(30100),
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     next='list_shows_2_from_a_to_z_CATEGORIES',
                     sens=params.sens,
                     page=str(int(params.page) + 100),
@@ -532,7 +594,7 @@ def list_videos(params):
                 'fanart': image,
                 'thumb': image,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     next='play_r',
                     id_diffusion=id_diffusion
                 ),
@@ -545,7 +607,7 @@ def list_videos(params):
         videos.append({
             'label': common.ADDON.get_localized_string(30100),
             'url': common.PLUGIN.get_url(
-                action='channel_entry',
+                action='module_entry',
                 mode=params.mode,
                 next=params.next,
                 page=str(int(params.page) + 1),
@@ -563,7 +625,7 @@ def list_videos(params):
         if 'search' in params.next:
             file_path = utils.download_catalog(
                 URL_SEARCH % (params.query, params.page),
-                '%s_%s_search.json' % (params.channel_name, params.query),
+                '%s_%s_search.json' % (params.submodule_name, params.query),
                 force_dl=True
             )
 
@@ -571,7 +633,7 @@ def list_videos(params):
             file_path = utils.download_catalog(
                 params.url % params.page,
                 '%s_%s_%s_last.json' % (
-                    params.channel_name,
+                    params.submodule_name,
                     params.page,
                     params.title)
             )
@@ -580,15 +642,15 @@ def list_videos(params):
             file_path = utils.download_catalog(
                 params.url % params.page,
                 '%s_%s_%s_last.json' % (
-                    params.channel_name,
+                    params.submodule_name,
                     params.page,
                     params.sens)
             )
 
         else:
             file_path = utils.download_catalog(
-                CHANNEL_CATALOG % params.channel_name,
-                '%s.json' % params.channel_name
+                CHANNEL_CATALOG % params.submodule_name,
+                '%s.json' % params.submodule_name
             )
         file_prgm = open(file_path).read()
         json_parser = json.loads(file_prgm)
@@ -615,7 +677,7 @@ def list_videos(params):
                 if 'search' in params.next or\
                         'from_a_to_z' in params.next or\
                         'last' in params.next:
-                    if chaine_id != params.channel_name:
+                    if chaine_id != params.submodule_name:
                         continue
 
                 file_prgm = utils.get_webcontent(
@@ -708,7 +770,7 @@ def list_videos(params):
                         'fanart': image,
                         'thumb': image,
                         'url': common.PLUGIN.get_url(
-                            action='channel_entry',
+                            action='module_entry',
                             next='play_r',
                             id_diffusion=id_diffusion
                         ),
@@ -722,7 +784,7 @@ def list_videos(params):
             videos.append({
                 'label': common.ADDON.get_localized_string(30100),
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     next='list_videos_search',
                     query=params.query,
                     page=str(int(params.page) + 20),
@@ -738,7 +800,7 @@ def list_videos(params):
             videos.append({
                 'label': common.ADDON.get_localized_string(30100),
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     url=params.url,
                     next=params.next,
                     page=str(int(params.page) + 20),
@@ -767,7 +829,7 @@ def list_videos(params):
     )
 
 
-@common.PLUGIN.mem_cached(common.CACHE_TIME)
+#@common.PLUGIN.mem_cached(common.CACHE_TIME)
 def list_live(params):
     """Build live listing"""
     lives = []
@@ -778,7 +840,7 @@ def list_live(params):
     date = ''
     genre = ''
 
-    if params.channel_name == 'francetvsport':
+    if params.submodule_name == 'francetvsport':
 
         list_lives = utils.get_webcontent(
             URL_FRANCETV_SPORT % 'directs')
@@ -814,7 +876,7 @@ def list_live(params):
                     'fanart': image,
                     'thumb': image,
                     'url': common.PLUGIN.get_url(
-                        action='channel_entry',
+                        action='module_entry',
                         next='play_l',
                         id_diffusion=id_diffusion
                     ),
@@ -852,7 +914,7 @@ def list_live(params):
                 'fanart': image,
                 'thumb': image,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     next='list_live'
                 ),
                 'is_playable': False,
@@ -860,9 +922,9 @@ def list_live(params):
                 'context_menu': context_menu
             })
 
-    elif params.channel_name == 'franceinfo':
+    elif params.submodule_name == 'franceinfo':
 
-        title = '%s Live' % params.channel_name
+        title = '%s Live' % params.submodule_name
 
         info = {
             'video': {
@@ -876,7 +938,7 @@ def list_live(params):
         lives.append({
             'label': title,
             'url': common.PLUGIN.get_url(
-                action='channel_entry',
+                action='module_entry',
                 next='play_l'
             ),
             'is_playable': True,
@@ -884,7 +946,7 @@ def list_live(params):
             'context_menu': context_menu
         })
 
-    elif params.channel_name == 'la_1ere':
+    elif params.submodule_name == 'la_1ere':
 
         for id_stream, title_stream in LIVE_LA_1ERE.iteritems():
             title = '%s Live' % title_stream
@@ -901,7 +963,7 @@ def list_live(params):
             lives.append({
                 'label': title,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     next='play_l',
                     id_stream=id_stream
                 ),
@@ -910,7 +972,7 @@ def list_live(params):
                 'context_menu': context_menu
             })
 
-    elif params.channel_name == 'france3regions':
+    elif params.submodule_name == 'france3regions':
 
         for id_stream, title_stream in LIVE_FR3_REGIONS.iteritems():
             title = '%s Live' % title_stream
@@ -927,7 +989,7 @@ def list_live(params):
             lives.append({
                 'label': title,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     next='play_l',
                     id_stream=id_stream
                 ),
@@ -937,11 +999,11 @@ def list_live(params):
             })
 
     else:
-        url_json_live = CHANNEL_LIVE % (params.channel_name)
+        url_json_live = CHANNEL_LIVE % (params.submodule_name)
         file_path_live = utils.download_catalog(
             url_json_live,
             'live_%s.json' % (
-                params.channel_name))
+                params.submodule_name))
         file_prgm_live = open(file_path_live).read()
         json_parser_live = json.loads(file_prgm_live)
         emissions_live = json_parser_live['reponse']['emissions']
@@ -1012,7 +1074,7 @@ def list_live(params):
                 'fanart': image,
                 'thumb': image,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     next='play_l',
                 ),
                 'is_playable': True,
@@ -1077,16 +1139,16 @@ def get_video_url(params):
 
     elif params.next == 'play_l':
 
-        if params.channel_name == 'la_1ere' or \
-                params.channel_name == 'france3regions':
+        if params.submodule_name == 'la_1ere' or \
+                params.submodule_name == 'france3regions':
             file_prgm = utils.get_webcontent(
                 LIVE_INFO % (params.id_stream))
-        elif params.channel_name == 'francetvsport':
+        elif params.submodule_name == 'francetvsport':
             file_prgm = utils.get_webcontent(
                 SHOW_INFO % (params.id_diffusion))
         else:
             file_prgm = utils.get_webcontent(
-                LIVE_INFO % (params.channel_name))
+                LIVE_INFO % (params.submodule_name))
 
         json_parser = json.loads(file_prgm)
 

@@ -43,13 +43,13 @@ context_menu.append(utils.vpn_context_menu_item())
 URL_ROOT = 'http://www.nrj-play.fr'
 
 URL_REPLAY = 'http://www.nrj-play.fr/%s/replay'
-# channel_name (nrj12, ...)
+# submodule_name (nrj12, ...)
 
 URL_COLLECTION_API = 'http://www.nrj-play.fr/%s/api/getreplaytvcollection'
-# channel_name (nrj12, ...)
+# submodule_name (nrj12, ...)
 
 URL_REPLAY_API = 'http://www.nrj-play.fr/%s/api/getreplaytvlist'
-# channel_name (nrj12, ...) - HTTP 500 non stable
+# submodule_name (nrj12, ...) - HTTP 500 non stable
 
 URL_ALL_VIDEO = 'http://www.nrj-play.fr/sitemap-videos.xml'
 # Meilleur stabilité mais perte des collections
@@ -65,7 +65,7 @@ URL_LIVE_WITH_TOKEN = 'http://www.nrj-play.fr/compte/live?channel=%s'
 # call this url after get session (url live with token inside this page)
 
 
-def channel_entry(params):
+def module_entry(params):
     """Entry function of the module"""
     if 'root' in params.next:
         return root(params)
@@ -90,10 +90,10 @@ def root(params):
     modes.append({
         'label': 'Replay',
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='list_shows_1',
-            category='%s Replay' % params.channel_name.upper(),
-            window_title='%s Replay' % params.channel_name
+            category='%s Replay' % params.submodule_name.upper(),
+            window_title='%s Replay' % params.submodule_name
         ),
         'context_menu': context_menu
     })
@@ -102,10 +102,10 @@ def root(params):
     modes.append({
         'label': 'Replay sans categorie',
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='list_shows_without_categories',
-            category='%s Replay' % params.channel_name.upper(),
-            window_title='%s Replay' % params.channel_name
+            category='%s Replay' % params.submodule_name.upper(),
+            window_title='%s Replay' % params.submodule_name
         ),
         'context_menu': context_menu
     })
@@ -114,10 +114,10 @@ def root(params):
     modes.append({
         'label': 'Live TV',
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='live_cat',
-            category='%s Live TV' % params.channel_name.upper(),
-            window_title='%s Live TV' % params.channel_name
+            category='%s Live TV' % params.submodule_name.upper(),
+            window_title='%s Live TV' % params.submodule_name
         ),
         'context_menu': context_menu
     })
@@ -145,7 +145,7 @@ def list_shows(params):
         shows.append({
             'label': state_video,
             'url': common.PLUGIN.get_url(
-                action='channel_entry',
+                action='module_entry',
                 state_video=state_video,
                 next='list_videos_1',
                 # title_category=category_name,
@@ -158,8 +158,8 @@ def list_shows(params):
         unique_item = dict()
 
         file_path = utils.download_catalog(
-            URL_COLLECTION_API % params.channel_name,
-            '%s_collection.xml' % params.channel_name,
+            URL_COLLECTION_API % params.submodule_name,
+            '%s_collection.xml' % params.submodule_name,
         )
         collection_xml = open(file_path).read()
 
@@ -176,7 +176,7 @@ def list_shows(params):
             shows.append({
                 'label': state_video,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     state_video=state_video,
                     next='list_videos_1',
                     # title_category=category_name,
@@ -195,7 +195,7 @@ def list_shows(params):
                     shows.append({
                         'label': category_name,
                         'url': common.PLUGIN.get_url(
-                            action='channel_entry',
+                            action='module_entry',
                             category_name=category_name,
                             next='list_shows_programs',
                             # title_category=category_name,
@@ -223,7 +223,7 @@ def list_shows(params):
                         'label': name_program,
                         'thumb': img_program,
                         'url': common.PLUGIN.get_url(
-                            action='channel_entry',
+                            action='module_entry',
                             next='list_videos_1',
                             state_video=state_video,
                             id_program=id_program,
@@ -252,7 +252,7 @@ def list_videos(params):
 
         file_path = utils.download_catalog(
             URL_ALL_VIDEO,
-            '%s_all_video.xml' % params.channel_name,
+            '%s_all_video.xml' % params.submodule_name,
         )
         replay_xml = open(file_path).read()
 
@@ -266,7 +266,7 @@ def list_videos(params):
             url_site = program.findtext(
                 "{http://www.sitemaps.org/schemas/sitemap/0.9}loc"
             ).encode('utf-8')
-            check_string = '%s/replay/' % params.channel_name
+            check_string = '%s/replay/' % params.submodule_name
             if url_site.count(check_string) > 0:
 
                 # Title
@@ -336,7 +336,7 @@ def list_videos(params):
                     'fanart': img,
                     'thumb': img,
                     'url': common.PLUGIN.get_url(
-                        action='channel_entry',
+                        action='module_entry',
                         next='play_r',
                         url_video=url
                     ),
@@ -347,8 +347,8 @@ def list_videos(params):
 
     else:
         file_path = utils.download_catalog(
-            URL_REPLAY_API % params.channel_name,
-            '%s_replay.xml' % params.channel_name,
+            URL_REPLAY_API % params.submodule_name,
+            '%s_replay.xml' % params.submodule_name,
         )
         replay_xml = open(file_path).read()
 
@@ -424,7 +424,7 @@ def list_videos(params):
                     'fanart': img,
                     'thumb': img,
                     'url': common.PLUGIN.get_url(
-                        action='channel_entry',
+                        action='module_entry',
                         next='play_r',
                         url_video=url
                     ),
@@ -500,7 +500,7 @@ def list_videos(params):
                     'fanart': img,
                     'thumb': img,
                     'url': common.PLUGIN.get_url(
-                        action='channel_entry',
+                        action='module_entry',
                         next='play_r',
                         url_video=url
                     ),
@@ -557,9 +557,9 @@ def list_live(params):
 
     # GET page with url_live with the session logged
     result_3 = session_requests.get(
-        URL_LIVE_WITH_TOKEN % (params.channel_name),
+        URL_LIVE_WITH_TOKEN % (params.submodule_name),
         headers=dict(
-            referer=URL_LIVE_WITH_TOKEN % (params.channel_name)))
+            referer=URL_LIVE_WITH_TOKEN % (params.submodule_name)))
 
     root_soup = bs(result_3.text, 'html.parser')
     live_soup = root_soup.find('div', class_="player")
@@ -569,7 +569,7 @@ def list_live(params):
 
     url_live = url_live_json_jsonparser["file"]
 
-    title = '%s Live' % params.channel_name.upper()
+    title = '%s Live' % params.submodule_name.upper()
 
     info = {
         'video': {
@@ -584,7 +584,7 @@ def list_live(params):
         'fanart': img,
         'thumb': img,
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='play_l',
             url_live=url_live,
         ),

@@ -81,7 +81,7 @@ URL_JSON_VIDEO = 'https://pc.middleware.6play.fr/6play/v2/platforms/' \
 URL_IMG = 'https://images.6play.fr/v1/images/%s/raw'
 
 
-def channel_entry(params):
+def module_entry(params):
     """Entry function of the module"""
     if 'root' in params.next:
         return root(params)
@@ -106,10 +106,10 @@ def root(params):
     modes.append({
         'label': 'Replay',
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='list_shows_1',
-            category='%s Replay' % params.channel_name.upper(),
-            window_title='%s Replay' % params.channel_name
+            category='%s Replay' % params.submodule_name.upper(),
+            window_title='%s Replay' % params.submodule_name
         ),
     })
 
@@ -121,9 +121,9 @@ def root(params):
         ),
     )
     """
-    params.window_title = '%s Replay' % params.channel_name
+    params.window_title = '%s Replay' % params.submodule_name
     params.next = "list_shows_1"
-    return channel_entry(params)
+    return module_entry(params)
 
 
 @common.PLUGIN.mem_cached(common.CACHE_TIME)
@@ -134,19 +134,19 @@ def list_shows(params):
     if params.next == 'list_shows_1':
 
         url_root_site = ''
-        if params.channel_name == 'stories' or \
-                params.channel_name == 'bruce' or \
-                params.channel_name == 'crazy_kitchen' or \
-                params.channel_name == 'home' or \
-                params.channel_name == 'styles' or \
-                params.channel_name == 'comedy':
-            url_root_site = URL_ROOT % params.channel_name
+        if params.submodule_name == 'stories' or \
+                params.submodule_name == 'bruce' or \
+                params.submodule_name == 'crazy_kitchen' or \
+                params.submodule_name == 'home' or \
+                params.submodule_name == 'styles' or \
+                params.submodule_name == 'comedy':
+            url_root_site = URL_ROOT % params.submodule_name
         else:
-            url_root_site = URL_ROOT % (params.channel_name + 'replay')
+            url_root_site = URL_ROOT % (params.submodule_name + 'replay')
 
         file_path = utils.download_catalog(
             url_root_site,
-            '%s.json' % (params.channel_name),
+            '%s.json' % (params.submodule_name),
             random_ua=True)
         file_prgm = open(file_path).read()
         json_parser = json.loads(file_prgm)
@@ -166,7 +166,7 @@ def list_shows(params):
             shows.append({
                 'label': category_name,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     category_id=category_id,
                     next='list_shows_2',
                     title=category_name,
@@ -217,7 +217,7 @@ def list_shows(params):
                 'thumb': program_img,
                 'fanart': program_fanart,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     next='list_shows_3',
                     program_id=program_id,
                     program_img=program_img,
@@ -267,7 +267,7 @@ def list_shows(params):
                 'thumb': params.program_img,
                 'fanart': program_fanart,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     next='list_videos',
                     program_id=params.program_id,
                     sub_category_id=sub_category_id,
@@ -289,7 +289,7 @@ def list_shows(params):
             'thumb': params.program_img,
             'fanart': program_fanart,
             'url': common.PLUGIN.get_url(
-                action='channel_entry',
+                action='module_entry',
                 next='list_videos',
                 program_id=params.program_id,
                 sub_category_id='null',
@@ -385,7 +385,7 @@ def list_videos(params):
             'label': title,
             'thumb': program_img,
             'url': common.PLUGIN.get_url(
-                action='channel_entry',
+                action='module_entry',
                 next='play',
                 video_id=video_id,
             ),

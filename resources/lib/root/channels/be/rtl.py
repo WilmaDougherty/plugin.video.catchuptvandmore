@@ -45,7 +45,7 @@ URL_XML_LIVE = 'http://www.rtl.be/videos/player/lives/11000/%s.xml'
 # live id
 
 
-def channel_entry(params):
+def module_entry(params):
     """Entry function of the module"""
     if 'root' in params.next:
         return root(params)
@@ -70,10 +70,10 @@ def root(params):
     modes.append({
         'label': 'Replay',
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='list_shows_1',
-            category='%s Replay' % params.channel_name.upper(),
-            window_title='%s Replay' % params.channel_name.upper()
+            category='%s Replay' % params.submodule_name.upper(),
+            window_title='%s Replay' % params.submodule_name.upper()
         ),
         'context_menu': context_menu
     })
@@ -82,10 +82,10 @@ def root(params):
     modes.append({
         'label': 'Live TV',
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='live_cat',
-            category='%s Live TV' % params.channel_name.upper(),
-            window_title='%s Live TV' % params.channel_name.upper()
+            category='%s Live TV' % params.submodule_name.upper(),
+            window_title='%s Live TV' % params.submodule_name.upper()
         ),
         'context_menu': context_menu
     })
@@ -109,8 +109,8 @@ def list_shows(params):
 
     if params.next == 'list_shows_1':
         file_path = utils.download_catalog(
-            URL_ROOT % params.channel_name,
-            '%s_root.html' % params.channel_name)
+            URL_ROOT % params.submodule_name,
+            '%s_root.html' % params.submodule_name)
         root_html = open(file_path).read()
         root_soup = bs(root_html, 'html.parser')
 
@@ -143,13 +143,13 @@ def list_shows(params):
                         'article',
                         attrs={'card': 'video'}))
                     next = 'list_videos'
-                    category_url = URL_ROOT % params.channel_name
+                    category_url = URL_ROOT % params.submodule_name
 
                 shows.append({
                     'label': category_title,
                     'url': common.PLUGIN.get_url(
                         category_title=category_title,
-                        action='channel_entry',
+                        action='module_entry',
                         category_url=category_url,
                         next=next,
                         window_title=category_title,
@@ -162,7 +162,7 @@ def list_shows(params):
         file_path = utils.download_catalog(
             params.category_url,
             '%s_%s.html' % (
-                params.channel_name,
+                params.submodule_name,
                 params.category_title))
         replay_html = open(file_path).read()
         replay_soup = bs(replay_html, 'html.parser')
@@ -180,7 +180,7 @@ def list_shows(params):
                 'label': category_title,
                 'url': common.PLUGIN.get_url(
                     category_title=category_title,
-                    action='channel_entry',
+                    action='module_entry',
                     category_url=category_url,
                     next='list_shows_cat',
                     window_title=category_title,
@@ -193,7 +193,7 @@ def list_shows(params):
         file_path = utils.download_catalog(
             params.category_url,
             '%s_%s_%s.html' % (
-                params.channel_name,
+                params.submodule_name,
                 params.category_title,
                 params.index_page))
         category_html = open(file_path).read()
@@ -217,7 +217,7 @@ def list_shows(params):
                 'thumb': program_img,
                 'url': common.PLUGIN.get_url(
                     program_title=program_title,
-                    action='channel_entry',
+                    action='module_entry',
                     program_url=program_url,
                     next='list_videos',
                     window_title=program_title
@@ -235,7 +235,7 @@ def list_shows(params):
                 'label': common.ADDON.get_localized_string(30108),
                 'url': common.PLUGIN.get_url(
                     category_title=params.category_title,
-                    action='channel_entry',
+                    action='module_entry',
                     category_url=url,
                     next=params.next,
                     window_title=params.category_title,
@@ -289,7 +289,7 @@ def list_videos(params):
     file_path = utils.download_catalog(
         url,
         '%s_%s_%s.html' % (
-            params.channel_name,
+            params.submodule_name,
             title,
             index_page))
     videos_html = open(file_path).read()
@@ -357,7 +357,7 @@ def list_videos(params):
             'label': video_title,
             'thumb': video_img,
             'url': common.PLUGIN.get_url(
-                action='channel_entry',
+                action='module_entry',
                 next='play_r',
                 video_url=video_url
             ),
@@ -380,7 +380,7 @@ def list_videos(params):
                 'label': common.ADDON.get_localized_string(30100),
                 'url': common.PLUGIN.get_url(
                     category_title=title,
-                    action='channel_entry',
+                    action='module_entry',
                     category_url=url,
                     next=params.next,
                     window_title=title,
@@ -418,8 +418,8 @@ def list_live(params):
 
     # get liveid
     file_path = utils.download_catalog(
-        URL_ROOT_LIVE % (params.channel_name),
-        '%s_live.html' % (params.channel_name))
+        URL_ROOT_LIVE % (params.submodule_name),
+        '%s_live.html' % (params.submodule_name))
     live_html = open(file_path).read()
 
     root_soup = bs(live_html, 'html.parser')
@@ -433,7 +433,7 @@ def list_live(params):
 
         file_path = utils.download_catalog(
             URL_XML_LIVE % (get_liveid),
-            '%s_live.xml' % (params.channel_name))
+            '%s_live.xml' % (params.submodule_name))
         live_xml = open(file_path).read()
 
         # XML not well build (missing header ...)
@@ -457,7 +457,7 @@ def list_live(params):
             'fanart': img,
             'thumb': img,
             'url': common.PLUGIN.get_url(
-                action='channel_entry',
+                action='module_entry',
                 next='play_l',
                 url_live=url_live,
             ),
@@ -484,7 +484,7 @@ def list_live(params):
             'fanart': img,
             'thumb': img,
             'url': common.PLUGIN.get_url(
-                action='channel_entry',
+                action='module_entry',
                 next='play_l',
                 url_live=url_live,
             ),

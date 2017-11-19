@@ -79,7 +79,7 @@ URL_EMISSIONS_CNEWS = URL_ROOT_SITE + '/emissions'
 URL_INFO_CONTENT = 'http://service.canal-plus.com/' \
                    'video/rest/getvideos/%s/%s?format=json'
 
-CHANNEL_NAME_CATALOG = {
+submodule_name_CATALOG = {
     'cplus': 'cplus',
     'c8': 'd8',
     'cstar': 'd17',
@@ -87,7 +87,7 @@ CHANNEL_NAME_CATALOG = {
 }
 
 
-def channel_entry(params):
+def module_entry(params):
     """Entry function of the module"""
     if 'root' in params.next:
         return root(params)
@@ -114,9 +114,9 @@ def get_token():
 @common.PLUGIN.mem_cached(common.CACHE_TIME)
 def get_channel_id(params):
     """Get channel id by name"""
-    if params.channel_name == 'c8':
+    if params.submodule_name == 'c8':
         return '1'
-    elif params.channel_name == 'cstar':
+    elif params.submodule_name == 'cstar':
         return '2'
 
 
@@ -129,10 +129,10 @@ def root(params):
     modes.append({
         'label': 'Replay',
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='list_shows_1',
-            category='%s Replay' % params.channel_name.upper(),
-            window_title='%s Replay' % params.channel_name
+            category='%s Replay' % params.submodule_name.upper(),
+            window_title='%s Replay' % params.submodule_name
         ),
         'context_menu': context_menu
     })
@@ -141,10 +141,10 @@ def root(params):
     modes.append({
         'label': _('Live TV'),
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='live_cat',
-            category='%s Live TV' % params.channel_name.upper(),
-            window_title='%s Live TV' % params.channel_name
+            category='%s Live TV' % params.submodule_name.upper(),
+            window_title='%s Live TV' % params.submodule_name
         ),
         'context_menu': context_menu
     })
@@ -165,12 +165,12 @@ def list_shows(params):
     shows = []
 
     # ################## BEGIN CNEWS ###########################
-    if params.next == 'list_shows_1' and params.channel_name == 'cnews':
+    if params.next == 'list_shows_1' and params.submodule_name == 'cnews':
 
         file_path = utils.download_catalog(
-            URL_VIDEOS_CNEWS % params.channel_name,
+            URL_VIDEOS_CNEWS % params.submodule_name,
             '%s_categories.html' % (
-                params.channel_name))
+                params.submodule_name))
         root_html = open(file_path).read()
         root_soup = bs(root_html, 'html.parser')
 
@@ -182,13 +182,13 @@ def list_shows(params):
 
             category_name = category.get_text().encode('utf-8')
             category_url = (
-                URL_ROOT_SITE % params.channel_name) + category.get('href')
+                URL_ROOT_SITE % params.submodule_name) + category.get('href')
 
             if category_name != 'Les tops':
                 shows.append({
                     'label': category_name,
                     'url': common.PLUGIN.get_url(
-                        action='channel_entry',
+                        action='module_entry',
                         category_url=category_url,
                         category_name=category_name,
                         next='list_shows_2',
@@ -197,14 +197,14 @@ def list_shows(params):
                     'context_menu': context_menu
                 })
 
-    elif params.next == 'list_shows_2' and params.channel_name == 'cnews':
+    elif params.next == 'list_shows_2' and params.submodule_name == 'cnews':
 
         if params.category_name == 'Les sujets':
 
             file_path = utils.download_catalog(
                 params.category_url,
                 '%s_%s.html' % (
-                    params.channel_name, params.category_name))
+                    params.submodule_name, params.category_name))
             root_html = open(file_path).read()
             root_soup = bs(root_html, 'html.parser')
             categories_soup = root_soup.find_all('a', class_="checkbox")
@@ -213,12 +213,12 @@ def list_shows(params):
 
                 category_name = category.get_text().encode('utf-8')
                 category_url = (
-                    URL_ROOT_SITE % params.channel_name) + category.get('href')
+                    URL_ROOT_SITE % params.submodule_name) + category.get('href')
 
                 shows.append({
                     'label': category_name,
                     'url': common.PLUGIN.get_url(
-                        action='channel_entry',
+                        action='module_entry',
                         category_url=category_url,
                         page="1",
                         category_name=category_name,
@@ -230,9 +230,9 @@ def list_shows(params):
         else:
             # Find all emissions
             file_path = utils.download_catalog(
-                (URL_EMISSIONS_CNEWS % params.channel_name),
+                (URL_EMISSIONS_CNEWS % params.submodule_name),
                 '%s_ALL_EMISSION.html' % (
-                    params.channel_name))
+                    params.submodule_name))
             root_html = open(file_path).read()
             root_soup = bs(root_html, 'html.parser')
 
@@ -242,7 +242,7 @@ def list_shows(params):
 
                 category_name = category.find('h3').get_text().encode('utf-8')
                 category_url = (
-                    URL_VIDEOS_CNEWS % params.channel_name) + \
+                    URL_VIDEOS_CNEWS % params.submodule_name) + \
                     '/emissions' + \
                     category.find('a').get('href').split('.fr')[1]
                 category_img = category.find('img').get('src').encode('utf-8')
@@ -252,7 +252,7 @@ def list_shows(params):
                     'thumb': category_img,
                     'fanart': category_img,
                     'url': common.PLUGIN.get_url(
-                        action='channel_entry',
+                        action='module_entry',
                         category_url=category_url,
                         page="1",
                         category_name=category_name,
@@ -266,11 +266,11 @@ def list_shows(params):
 
     # ################## BEGIN C8 and CStar ##################
     elif params.next == 'list_shows_1' and \
-            (params.channel_name == 'c8' or
-             params.channel_name == 'cstar'):
+            (params.submodule_name == 'c8' or
+             params.submodule_name == 'cstar'):
         file_path = utils.download_catalog(
             URL_REPLAY_C8__CSTAR_ROOT % get_channel_id(params),
-            '%s.json' % (params.channel_name))
+            '%s.json' % (params.submodule_name))
         file_categories = open(file_path).read()
         json_categories = json.loads(file_categories)
 
@@ -281,7 +281,7 @@ def list_shows(params):
             shows.append({
                 'label': title,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     slug=slug,
                     next='list_shows_2',
                     title=title,
@@ -291,12 +291,12 @@ def list_shows(params):
             })
 
     elif params.next == 'list_shows_2' and \
-            (params.channel_name == 'c8' or
-             params.channel_name == 'cstar'):
+            (params.submodule_name == 'c8' or
+             params.submodule_name == 'cstar'):
         # Create category's programs list
         file_path = utils.download_catalog(
             URL_REPLAY_C8__CSTAR_ROOT % get_channel_id(params),
-            '%s_%s.json' % (params.channel_name, params.slug))
+            '%s_%s.json' % (params.submodule_name, params.slug))
         file_categories = open(file_path).read()
         json_categories = json.loads(file_categories)
 
@@ -311,7 +311,7 @@ def list_shows(params):
                     shows.append({
                         'label': title,
                         'url': common.PLUGIN.get_url(
-                            action='channel_entry',
+                            action='module_entry',
                             next='list_videos_cat',
                             id=id,
                             videos_recent=videos_recent,
@@ -324,12 +324,12 @@ def list_shows(params):
     # ################## END C8 and CStar ##################
 
     # ################## BEGIN CANAL + ##################
-    elif params.next == 'list_shows_1' and params.channel_name == 'cplus':
+    elif params.next == 'list_shows_1' and params.submodule_name == 'cplus':
 
         file_path = utils.download_catalog(
             URL_LIST_EMISSIONS_CPLUS,
             '%s_categories.html' % (
-                params.channel_name))
+                params.submodule_name))
         root_html = open(file_path).read()
         root_soup = bs(root_html, 'html.parser')
 
@@ -347,7 +347,7 @@ def list_shows(params):
                     'thumb': category_img,
                     'fanart': category_img,
                     'url': common.PLUGIN.get_url(
-                        action='channel_entry',
+                        action='module_entry',
                         category_url=category_url,
                         category_name=category_name,
                         next='list_shows_2',
@@ -356,12 +356,12 @@ def list_shows(params):
                     'context_menu': context_menu
                 })
 
-    elif params.next == 'list_shows_2' and params.channel_name == 'cplus':
+    elif params.next == 'list_shows_2' and params.submodule_name == 'cplus':
 
         file_path = utils.download_catalog(
             params.category_url,
             '%s_%s.html' % (
-                params.channel_name, params.category_name))
+                params.submodule_name, params.category_name))
         root_html = open(file_path).read()
         root_soup = bs(root_html, 'html.parser')
 
@@ -374,7 +374,7 @@ def list_shows(params):
             shows.append({
                 'label': section,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     category_url=params.category_url,
                     category_name=params.category_name,
                     category_section=section,
@@ -404,14 +404,14 @@ def list_videos(params):
         videos = ast.literal_eval(params['previous_listing'])
 
     # ################## BEGIN CNEWS ###########################
-    if params.channel_name == 'cnews':
+    if params.submodule_name == 'cnews':
 
         url_page = params.category_url + '/page/%s' % params.page
 
         file_path = utils.download_catalog(
             url_page,
             '%s_%s_%s.html' % (
-                params.channel_name, params.category_name, params.page))
+                params.submodule_name, params.category_name, params.page))
         root_html = open(file_path).read()
         root_soup = bs(root_html, 'html.parser')
 
@@ -468,7 +468,7 @@ def list_videos(params):
                 'thumb': thumb,
                 'fanart': thumb,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     next='play_r',
                     id=id
                 ),
@@ -481,7 +481,7 @@ def list_videos(params):
         videos.append({
             'label': common.ADDON.get_localized_string(30100),
             'url': common.PLUGIN.get_url(
-                action='channel_entry',
+                action='module_entry',
                 category_url=params.category_url,
                 category_name=params.category_name,
                 next='list_videos',
@@ -494,11 +494,11 @@ def list_videos(params):
     # ################## END CNEWS ###########################
 
     # ################## BEGIN C8 and CStar ##################
-    elif params.channel_name == 'c8' or params.channel_name == 'cstar':
+    elif params.submodule_name == 'c8' or params.submodule_name == 'cstar':
         file_path = utils.download_catalog(
             URL_REPLAY_C8__CSTAR_SHOWS % (
                 get_channel_id(params), params.videos_recent),
-            '%s_%s.json' % (params.channel_name, params.videos_recent))
+            '%s_%s.json' % (params.submodule_name, params.videos_recent))
         file_videos = open(file_path).read()
         videos_json = json.loads(file_videos)
 
@@ -557,7 +557,7 @@ def list_videos(params):
                 'label': title,
                 'thumb': thumb,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     next='play_r',
                     id=id,
                 ),
@@ -568,12 +568,12 @@ def list_videos(params):
     # ################## END C8 and CStar ##################
 
     # ################## BEGIN Canal + ##################
-    elif params.channel_name == 'cplus':
+    elif params.submodule_name == 'cplus':
 
         file_path = utils.download_catalog(
             params.category_url,
             '%s_%s_%s.html' % (
-                params.channel_name,
+                params.submodule_name,
                 params.category_name,
                 params.category_section))
         root_html = open(file_path).read()
@@ -635,7 +635,7 @@ def list_videos(params):
                         'thumb': thumb,
                         'fanart': thumb,
                         'url': common.PLUGIN.get_url(
-                            action='channel_entry',
+                            action='module_entry',
                             next='play_r',
                             id=id
                         ),
@@ -674,24 +674,24 @@ def list_live(params):
     url_live = ''
 
     url_live_html = ''
-    if params.channel_name == 'cplus':
+    if params.submodule_name == 'cplus':
         url_live_html = URL_LIVE_CPLUS
-    elif params.channel_name == 'c8':
+    elif params.submodule_name == 'c8':
         url_live_html = URL_LIVE_C8
-    elif params.channel_name == 'cstar':
+    elif params.submodule_name == 'cstar':
         url_live_html = URL_LIVE_CSTAR
-    elif params.channel_name == 'cnews':
+    elif params.submodule_name == 'cnews':
         url_live_html = URL_LIVE_CNEWS
 
     file_path_html = utils.download_catalog(
         url_live_html,
-        '%s_live.html' % (params.channel_name)
+        '%s_live.html' % (params.submodule_name)
     )
     html_live = open(file_path_html).read()
 
     video_id_re = ''
 
-    if params.channel_name == 'cnews':
+    if params.submodule_name == 'cnews':
         video_id_re = re.compile(r'content: \'(.*?)\'').findall(html_live)
     else:
         video_id_re = re.compile(
@@ -699,9 +699,9 @@ def list_live(params):
 
     file_path_json = utils.download_catalog(
         URL_INFO_CONTENT % (
-            CHANNEL_NAME_CATALOG[params.channel_name], video_id_re[0]),
+            submodule_name_CATALOG[params.submodule_name], video_id_re[0]),
         '%s_%s_live.json' % (
-            CHANNEL_NAME_CATALOG[params.channel_name], video_id_re[0])
+            submodule_name_CATALOG[params.submodule_name], video_id_re[0])
     )
     file_live_json = open(file_path_json).read()
     json_parser = json.loads(file_live_json)
@@ -724,7 +724,7 @@ def list_live(params):
         'fanart': img,
         'thumb': img,
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='play_l',
             url=url_live,
         ),
@@ -749,7 +749,7 @@ def get_video_url(params):
     if params.next == 'play_r' or params.next == 'download_video':
         file_video = utils.get_webcontent(
             URL_INFO_CONTENT % (
-                CHANNEL_NAME_CATALOG[params.channel_name], params.id)
+                submodule_name_CATALOG[params.submodule_name], params.id)
         )
         media_json = json.loads(file_video)
         return media_json['MEDIA']['VIDEOS']['HLS'].encode('utf-8')

@@ -43,7 +43,7 @@ URL_TV5MAF_ROOT = 'https://afrique.tv5monde.com'
 URL_TV5MONDE_LIVE = 'http://live.tv5monde.com/'
 
 
-def channel_entry(params):
+def module_entry(params):
     """Entry function of the module"""
     if 'root' in params.next:
         return root(params)
@@ -73,28 +73,28 @@ def root(params):
     modes = []
 
     # Add Replay
-    if params.channel_name != 'tv5monde' and \
-       params.channel_name != 'tivi5monde':
+    if params.submodule_name != 'tv5monde' and \
+       params.submodule_name != 'tivi5monde':
         modes.append({
             'label': 'Replay',
             'url': common.PLUGIN.get_url(
-                action='channel_entry',
+                action='module_entry',
                 next='list_shows_1',
-                category='%s Replay' % params.channel_name.upper(),
-                window_title='%s Replay' % params.channel_name.upper()
+                category='%s Replay' % params.submodule_name.upper(),
+                window_title='%s Replay' % params.submodule_name.upper()
             ),
             'context_menu': context_menu
         })
 
     # Add Live
-    if params.channel_name != 'tv5mondeafrique':
+    if params.submodule_name != 'tv5mondeafrique':
         modes.append({
             'label': _('Live TV'),
             'url': common.PLUGIN.get_url(
-                action='channel_entry',
+                action='module_entry',
                 next='live_cat',
-                category='%s Live TV' % params.channel_name.upper(),
-                window_title='%s Live TV' % params.channel_name.upper()
+                category='%s Live TV' % params.submodule_name.upper(),
+                window_title='%s Live TV' % params.submodule_name.upper()
             ),
             'context_menu': context_menu
         })
@@ -115,7 +115,7 @@ def list_shows(params):
     shows = []
 
     if params.next == 'list_shows_1':
-        if params.channel_name == 'tv5mondeafrique':
+        if params.submodule_name == 'tv5mondeafrique':
             list_categories_html = utils.get_webcontent(
                 URL_TV5MAF_ROOT + '/videos')
             list_categories_soup = bs(
@@ -133,7 +133,7 @@ def list_shows(params):
                 shows.append({
                     'label': category_title,
                     'url': common.PLUGIN.get_url(
-                        action='channel_entry',
+                        action='module_entry',
                         next='list_shows_2',
                         title=category_title,
                         category_url=category_url,
@@ -143,7 +143,7 @@ def list_shows(params):
                 })
 
     elif params.next == 'list_shows_2':
-        if params.channel_name == 'tv5mondeafrique':
+        if params.submodule_name == 'tv5mondeafrique':
 
             list_shows_html = utils.get_webcontent(
                 params.category_url)
@@ -168,7 +168,7 @@ def list_shows(params):
                     'label': show_title,
                     'thumb': show_image,
                     'url': common.PLUGIN.get_url(
-                        action='channel_entry',
+                        action='module_entry',
                         next='list_videos_1',
                         title=show_title,
                         category_url=show_url,
@@ -192,7 +192,7 @@ def list_videos(params):
     videos = []
 
     if params.next == 'list_videos_1':
-        if params.channel_name == 'tv5mondeafrique':
+        if params.submodule_name == 'tv5mondeafrique':
 
             replay_videos_html = utils.get_webcontent(
                 params.category_url)
@@ -239,7 +239,7 @@ def list_videos(params):
                     'thumb': video_img,
                     'fanart': video_img,
                     'url': common.PLUGIN.get_url(
-                        action='channel_entry',
+                        action='module_entry',
                         next='play_r_tv5mondeafrique',
                         video_url=params.category_url
                     ),
@@ -269,7 +269,7 @@ def list_videos(params):
                         videos.append({
                             'label': video_title,
                             'url': common.PLUGIN.get_url(
-                                action='channel_entry',
+                                action='module_entry',
                                 next='list_videos_2',
                                 category_url=video_url
                             ),
@@ -319,7 +319,7 @@ def list_videos(params):
                             'label': video_title,
                             'thumb': video_img,
                             'url': common.PLUGIN.get_url(
-                                action='channel_entry',
+                                action='module_entry',
                                 next='play_r_tv5mondeafrique',
                                 video_url=video_url
                             ),
@@ -329,7 +329,7 @@ def list_videos(params):
                         })
 
     elif params.next == 'list_videos_2':
-        if params.channel_name == 'tv5mondeafrique':
+        if params.submodule_name == 'tv5mondeafrique':
             replay_videos_html = utils.get_webcontent(
                 params.category_url)
             replay_videos_soup = bs(replay_videos_html, 'html.parser')
@@ -372,7 +372,7 @@ def list_videos(params):
                     'label': video_title,
                     'thumb': video_img,
                     'url': common.PLUGIN.get_url(
-                        action='channel_entry',
+                        action='module_entry',
                         next='play_r_tv5mondeafrique',
                         video_url=video_url
                     ),
@@ -397,7 +397,7 @@ def list_live(params):
     """Build live listing"""
     lives = []
 
-    if params.channel_name == 'tv5monde':
+    if params.submodule_name == 'tv5monde':
         for live_name, live_id in LIST_LIVE_TV5MONDE.iteritems():
 
             live_title = live_name
@@ -420,7 +420,7 @@ def list_live(params):
                 'label': live_title,
                 'thumb': live_img,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     next='play_l',
                     live_url=live_url,
                 ),
@@ -428,7 +428,7 @@ def list_live(params):
                 'info': info
             })
 
-    elif params.channel_name == 'tivi5monde':
+    elif params.submodule_name == 'tivi5monde':
 
         for live_name, live_id in LIST_LIVE_TIVI5MONDE.iteritems():
 
@@ -452,7 +452,7 @@ def list_live(params):
                 'label': live_title,
                 'thumb': live_img,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     next='play_l',
                     live_url=live_url,
                 ),

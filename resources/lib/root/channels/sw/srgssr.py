@@ -41,23 +41,23 @@ context_menu = []
 context_menu.append(utils.vpn_context_menu_item())
 
 URL_ROOT = 'https://%s.%s.ch'
-# (www or play), channel_name
+# (www or play), submodule_name
 
 # Replay
 URL_CATEGORIES_JSON = 'https://%s.%s.ch/play/v2/tv/topicList?layout=json'
-# (www or play), channel_name
+# (www or play), submodule_name
 
 URL_EMISSIONS = 'https://www.%s.ch/play/tv/%s?index=all'
-# channel_name, name_emission
+# submodule_name, name_emission
 
 URL_LIST_EPISODES = 'https://www.%s.ch/play/v2/tv/show/%s/' \
                     'latestEpisodes/tillMonth/%s?' \
                     'numberOfEpisodes=50&layout=json'
-# channel_name, IdEmission, ThisMonth (11-2017)
+# submodule_name, IdEmission, ThisMonth (11-2017)
 
 # Live
 URL_LIVE_JSON = 'http://www.%s.ch/play/v2/tv/live/overview?layout=json'
-# channel_name
+# submodule_name
 
 URL_TOKEN = 'https://tp.srgssr.ch/akahd/token?acl=%s'
 # acl
@@ -65,10 +65,10 @@ URL_TOKEN = 'https://tp.srgssr.ch/akahd/token?acl=%s'
 URL_INFO_VIDEO = 'https://il.srgssr.ch/integrationlayer' \
                  '/2.0/%s/mediaComposition/video/%s.json' \
                  '?onlyChapters=true&vector=portalplay'
-# channel_name, video_id
+# submodule_name, video_id
 
 
-def channel_entry(params):
+def module_entry(params):
     """Entry function of the module"""
     if 'root' in params.next:
         return root(params)
@@ -100,24 +100,24 @@ def root(params):
     modes.append({
         'label': 'Replay',
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='list_shows_1',
             page='0',
-            category='%s Replay' % params.channel_name.upper(),
-            window_title='%s Replay' % params.channel_name
+            category='%s Replay' % params.submodule_name.upper(),
+            window_title='%s Replay' % params.submodule_name
         ),
         'context_menu': context_menu
     })
 
     # Add Live
-    if params.channel_name != 'swissinfo':
+    if params.submodule_name != 'swissinfo':
         modes.append({
             'label': _('Live TV'),
             'url': common.PLUGIN.get_url(
-                action='channel_entry',
+                action='module_entry',
                 next='live_cat',
-                category='%s Live TV' % params.channel_name.upper(),
-                window_title='%s Live TV' % params.channel_name
+                category='%s Live TV' % params.submodule_name.upper(),
+                window_title='%s Live TV' % params.submodule_name
             ),
             'context_menu': context_menu
         })
@@ -139,16 +139,16 @@ def list_shows(params):
 
     if params.next == 'list_shows_1':
 
-        if params.channel_name != 'swissinfo':
+        if params.submodule_name != 'swissinfo':
 
-            show_title = EMISSION_NAME[params.channel_name]
-            show_url = URL_EMISSIONS % (params.channel_name,
-                EMISSION_NAME[params.channel_name])
+            show_title = EMISSION_NAME[params.submodule_name]
+            show_url = URL_EMISSIONS % (params.submodule_name,
+                EMISSION_NAME[params.submodule_name])
 
             shows.append({
                 'label': show_title,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     next='list_shows_2',
                     title=show_title,
                     show_url=show_url,
@@ -157,7 +157,7 @@ def list_shows(params):
                 'context_menu': context_menu
             })
 
-        if params.channel_name == 'swissinfo':
+        if params.submodule_name == 'swissinfo':
             first_part_fqdn = 'play'
         else:
             first_part_fqdn = 'www'
@@ -165,7 +165,7 @@ def list_shows(params):
         file_path = utils.get_webcontent(
             URL_CATEGORIES_JSON % (
                 first_part_fqdn,
-                params.channel_name)
+                params.submodule_name)
         )
         replay_categories_json = json.loads(file_path)
 
@@ -173,13 +173,13 @@ def list_shows(params):
 
             show_title = category["title"].encode('utf-8')
             show_url = URL_ROOT % (first_part_fqdn,
-                params.channel_name) + \
+                params.submodule_name) + \
                 category["latestModuleUrl"].encode('utf-8')
 
             shows.append({
                 'label': show_title,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     next='list_videos_1',
                     title=show_title,
                     show_url=show_url,
@@ -213,7 +213,7 @@ def list_shows(params):
                         'label': show_title,
                         'thumb': show_image,
                         'url': common.PLUGIN.get_url(
-                            action='channel_entry',
+                            action='module_entry',
                             next='list_videos_2',
                             title=show_title,
                             show_id=show_id,
@@ -287,7 +287,7 @@ def list_videos(params):
                 'thumb': video_img,
                 'fanart': video_img,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     next='play_r',
                     video_url=video_url
                 ),
@@ -305,7 +305,7 @@ def list_videos(params):
 
         file_path = utils.get_webcontent(
             URL_LIST_EPISODES % (
-                params.channel_name,
+                params.submodule_name,
                 params.show_id,
                 actual_month))
 
@@ -354,7 +354,7 @@ def list_videos(params):
                 'thumb': video_img,
                 'fanart': video_img,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     next='play_r',
                     video_url=video_url
                 ),
@@ -391,7 +391,7 @@ def list_live(params):
     url_live = ''
 
     lives_datas = utils.get_webcontent(
-        URL_LIVE_JSON % params.channel_name)
+        URL_LIVE_JSON % params.submodule_name)
     lives_json = json.loads(lives_datas)
 
     for live in lives_json["teaser"]:
@@ -412,7 +412,7 @@ def list_live(params):
             'label': title,
             'thumb': img,
             'url': common.PLUGIN.get_url(
-                action='channel_entry',
+                action='module_entry',
                 next='play_l',
                 live_id=live_id,
             ),
@@ -436,12 +436,12 @@ def get_video_url(params):
     """Get video URL and start video player"""
     if params.next == 'play_r' or params.next == 'download_video':
         video_id = params.video_url.split('=')[1]
-        if params.channel_name == 'swissinfo':
-            channel_name_value = 'swi'
+        if params.submodule_name == 'swissinfo':
+            submodule_name_value = 'swi'
         else:
-            channel_name_value = params.channel_name
+            submodule_name_value = params.submodule_name
         streams_datas = utils.get_webcontent(
-            URL_INFO_VIDEO % (channel_name_value, video_id))
+            URL_INFO_VIDEO % (submodule_name_value, video_id))
         streams_json = json.loads(streams_datas)
 
         # build url
@@ -463,7 +463,7 @@ def get_video_url(params):
 
         streams_datas = utils.get_webcontent(
             URL_INFO_VIDEO % (
-                params.channel_name,
+                params.submodule_name,
                 params.live_id))
         streams_json = json.loads(streams_datas)
 

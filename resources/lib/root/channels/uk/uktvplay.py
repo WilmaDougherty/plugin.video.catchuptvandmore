@@ -41,7 +41,7 @@ context_menu.append(utils.vpn_context_menu_item())
 URL_ROOT = 'https://uktvplay.uktv.co.uk'
 
 URL_SHOWS = 'https://uktvplay.uktv.co.uk/shows/channel/%s/'
-# channel_name
+# submodule_name
 
 URL_AUTHENTICATE = 'https://live.mppglobal.com/api/accounts/authenticate'
 # POST Payload {email: "********@*******", password: "*********"}
@@ -54,7 +54,7 @@ URL_JS_POLICY_KEY = 'https://players.brightcove.net/%s/%s_default/index.min.js'
 # data-account, data-player
 
 
-def channel_entry(params):
+def module_entry(params):
     """Entry function of the module"""
     if 'root' in params.next:
         return root(params)
@@ -101,10 +101,10 @@ def root(params):
     modes.append({
         'label': 'Replay',
         'url': common.PLUGIN.get_url(
-            action='channel_entry',
+            action='module_entry',
             next='list_shows_1',
-            category='%s Replay' % params.channel_name.upper(),
-            window_title='%s Replay' % params.channel_name
+            category='%s Replay' % params.submodule_name.upper(),
+            window_title='%s Replay' % params.submodule_name
         ),
         'context_menu': context_menu
     })
@@ -127,8 +127,8 @@ def list_shows(params):
     if params.next == 'list_shows_1':
 
         file_path = utils.download_catalog(
-            URL_SHOWS % (params.channel_name),
-            '%s_show.html' % (params.channel_name)
+            URL_SHOWS % (params.submodule_name),
+            '%s_show.html' % (params.submodule_name)
         )
         replay_shows_html = open(file_path).read()
 
@@ -146,7 +146,7 @@ def list_shows(params):
                     'label': show_title,
                     'thumb': show_img,
                     'url': common.PLUGIN.get_url(
-                        action='channel_entry',
+                        action='module_entry',
                         next='list_shows_2',
                         title=show_title,
                         show_url=show_url,
@@ -159,7 +159,7 @@ def list_shows(params):
                     'label': show_title,
                     'thumb': show_img,
                     'url': common.PLUGIN.get_url(
-                        action='channel_entry',
+                        action='module_entry',
                         next='list_videos_1',
                         title=show_title,
                         show_url=show_url,
@@ -172,7 +172,7 @@ def list_shows(params):
 
         file_path = utils.download_catalog(
             params.show_url,
-            '%s_show_%s.html' % (params.channel_name, params.title)
+            '%s_show_%s.html' % (params.submodule_name, params.title)
         )
         replay_show_html = open(file_path).read()
 
@@ -190,7 +190,7 @@ def list_shows(params):
             shows.append({
                 'label': season_title,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     next='list_videos_1',
                     title=params.title + '_' + season_title,
                     show_url=params.show_url,
@@ -217,7 +217,7 @@ def list_videos(params):
     file_path = utils.download_catalog(
         params.show_url,
         '%s_show_%s.html' % (
-            params.channel_name, params.title)
+            params.submodule_name, params.title)
     )
     replay_show_season_html = open(file_path).read()
     seasons_episodes_soup = bs(replay_show_season_html, 'html.parser')
@@ -289,7 +289,7 @@ def list_videos(params):
                     'thumb': video_img,
                     'fanart': video_img,
                     'url': common.PLUGIN.get_url(
-                        action='channel_entry',
+                        action='module_entry',
                         next='play_r',
                         data_vidid=data_vidid,
                         data_account=data_account,
@@ -358,7 +358,7 @@ def list_videos(params):
                 'thumb': video_img,
                 'fanart': video_img,
                 'url': common.PLUGIN.get_url(
-                    action='channel_entry',
+                    action='module_entry',
                     next='play_r',
                     data_vidid=data_vidid,
                     data_account=data_account,
@@ -429,7 +429,7 @@ def list_videos(params):
             'thumb': video_img,
             'fanart': video_img,
             'url': common.PLUGIN.get_url(
-                action='channel_entry',
+                action='module_entry',
                 next='play_r',
                 data_vidid=data_vidid,
                 data_account=data_account,
