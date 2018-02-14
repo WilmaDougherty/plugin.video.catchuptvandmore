@@ -47,20 +47,19 @@ URL_DAILYMOTION_EMBED = 'http://www.dailymotion.com/embed/video/%s'
 # Video_id
 
 
-def module_entry(params):
-    """Entry function of the module"""
-    if 'root' in params.next:
-        return root(params)
-    elif 'list_shows' in params.next:
+def replay_entry(params):
+    if 'next' not in params:
+        params['next'] = 'list_shows_1'
         return list_shows(params)
-    elif 'list_videos' in params.next:
-        return list_videos(params)
-    elif 'live' in params.next:
-        return list_live(params)
-    elif 'play' in params.next:
-        return get_video_url(params)
     else:
-        return None
+        if 'list_shows' in params.next:
+            return list_shows(params)
+        elif 'list_videos' in params.next:
+            return list_videos(params)
+        elif 'play' in params.next:
+            return get_video_url(params)
+        else:
+            return None
 
 
 CORRECT_MONTH = {
@@ -77,45 +76,6 @@ CORRECT_MONTH = {
     'novembre': '11',
     'décembre': '12'
 }
-
-
-@common.PLUGIN.mem_cached(common.CACHE_TIME)
-def root(params):
-    """Add Replay and Live in the listing"""
-    modes = []
-
-    # Add Replay
-    modes.append({
-        'label': 'Replay',
-        'url': common.PLUGIN.get_url(
-            action='module_entry',
-            next='list_shows_1',
-            category='%s Replay' % params.submodule_name.upper(),
-            window_title='%s Replay' % params.submodule_name
-        ),
-        'context_menu': context_menu
-    })
-
-    # Add Live
-    modes.append({
-        'label': 'Live TV',
-        'url': common.PLUGIN.get_url(
-            action='module_entry',
-            next='live_cat',
-            category='%s Live TV' % params.submodule_name.upper(),
-            window_title='%s Live TV' % params.submodule_name
-        ),
-        'context_menu': context_menu
-    })
-
-    return common.PLUGIN.create_listing(
-        modes,
-        sort_methods=(
-            common.sp.xbmcplugin.SORT_METHOD_UNSORTED,
-            common.sp.xbmcplugin.SORT_METHOD_LABEL
-        ),
-        category=common.get_window_title()
-    )
 
 
 @common.PLUGIN.mem_cached(common.CACHE_TIME)
@@ -145,7 +105,7 @@ def list_shows(params):
             shows.append({
                 'label': category_name,
                 'url': common.PLUGIN.get_url(
-                    action='module_entry',
+                    action='replay_entry',
                     category_hash=category_hash,
                     next='list_videos_cat',
                     url=url,
@@ -252,7 +212,7 @@ def list_videos(params):
                 'thumb': video_img,
                 'fanart': video_img,
                 'url': common.PLUGIN.get_url(
-                    action='module_entry',
+                    action='replay_entry',
                     next='play_r',
                     video_id=video_id
                 ),
@@ -287,9 +247,7 @@ def list_videos(params):
 
 
 @common.PLUGIN.mem_cached(common.CACHE_TIME)
-def list_live(params):
-    """Build live listing"""
-    lives = []
+def get_live_tv_item(params, context_menu):
 
     title = ''
     plot = ''
@@ -317,28 +275,19 @@ def list_live(params):
         }
     }
 
-    lives.append({
+    return {
         'label': title,
         'fanart': img,
         'thumb': img,
         'url': common.PLUGIN.get_url(
-            action='module_entry',
+            action='replay_entry',
             next='play_l',
             video_id=video_id,
         ),
         'is_playable': True,
         'info': info,
         'context_menu': context_menu
-    })
-
-    return common.PLUGIN.create_listing(
-        lives,
-        sort_methods=(
-            common.sp.xbmcplugin.SORT_METHOD_UNSORTED,
-            common.sp.xbmcplugin.SORT_METHOD_LABEL
-        ),
-        category=common.get_window_title()
-    )
+    }
 
 
 @common.PLUGIN.mem_cached(common.CACHE_TIME)

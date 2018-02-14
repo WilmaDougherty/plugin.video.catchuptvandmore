@@ -65,20 +65,19 @@ URL_LIVE_WITH_TOKEN = 'http://www.nrj-play.fr/compte/live?channel=%s'
 # call this url after get session (url live with token inside this page)
 
 
-def module_entry(params):
-    """Entry function of the module"""
-    if 'root' in params.next:
+def replay_entry(params):
+    if 'next' not in params:
+        params['next'] = 'root'
         return root(params)
-    elif 'list_shows' in params.next:
-        return list_shows(params)
-    elif 'list_videos' in params.next:
-        return list_videos(params)
-    elif 'live' in params.next:
-        return list_live(params)
-    elif 'play' in params.next:
-        return get_video_url(params)
     else:
-        return None
+        if 'list_shows' in params.next:
+            return list_shows(params)
+        elif 'list_videos' in params.next:
+            return list_videos(params)
+        elif 'play' in params.next:
+            return get_video_url(params)
+        else:
+            return None
 
 
 @common.PLUGIN.mem_cached(common.CACHE_TIME)
@@ -90,7 +89,7 @@ def root(params):
     modes.append({
         'label': 'Replay',
         'url': common.PLUGIN.get_url(
-            action='module_entry',
+            action='replay_entry',
             next='list_shows_1',
             category='%s Replay' % params.submodule_name.upper(),
             window_title='%s Replay' % params.submodule_name
@@ -102,22 +101,10 @@ def root(params):
     modes.append({
         'label': 'Replay sans categorie',
         'url': common.PLUGIN.get_url(
-            action='module_entry',
+            action='replay_entry',
             next='list_shows_without_categories',
             category='%s Replay' % params.submodule_name.upper(),
             window_title='%s Replay' % params.submodule_name
-        ),
-        'context_menu': context_menu
-    })
-
-    # Add Live
-    modes.append({
-        'label': 'Live TV',
-        'url': common.PLUGIN.get_url(
-            action='module_entry',
-            next='live_cat',
-            category='%s Live TV' % params.submodule_name.upper(),
-            window_title='%s Live TV' % params.submodule_name
         ),
         'context_menu': context_menu
     })
@@ -145,7 +132,7 @@ def list_shows(params):
         shows.append({
             'label': state_video,
             'url': common.PLUGIN.get_url(
-                action='module_entry',
+                action='replay_entry',
                 state_video=state_video,
                 next='list_videos_1',
                 # title_category=category_name,
@@ -176,7 +163,7 @@ def list_shows(params):
             shows.append({
                 'label': state_video,
                 'url': common.PLUGIN.get_url(
-                    action='module_entry',
+                    action='replay_entry',
                     state_video=state_video,
                     next='list_videos_1',
                     # title_category=category_name,
@@ -195,7 +182,7 @@ def list_shows(params):
                     shows.append({
                         'label': category_name,
                         'url': common.PLUGIN.get_url(
-                            action='module_entry',
+                            action='replay_entry',
                             category_name=category_name,
                             next='list_shows_programs',
                             # title_category=category_name,
@@ -223,7 +210,7 @@ def list_shows(params):
                         'label': name_program,
                         'thumb': img_program,
                         'url': common.PLUGIN.get_url(
-                            action='module_entry',
+                            action='replay_entry',
                             next='list_videos_1',
                             state_video=state_video,
                             id_program=id_program,
@@ -336,7 +323,7 @@ def list_videos(params):
                     'fanart': img,
                     'thumb': img,
                     'url': common.PLUGIN.get_url(
-                        action='module_entry',
+                        action='replay_entry',
                         next='play_r',
                         url_video=url
                     ),
@@ -424,7 +411,7 @@ def list_videos(params):
                     'fanart': img,
                     'thumb': img,
                     'url': common.PLUGIN.get_url(
-                        action='module_entry',
+                        action='replay_entry',
                         next='play_r',
                         url_video=url
                     ),
@@ -500,7 +487,7 @@ def list_videos(params):
                     'fanart': img,
                     'thumb': img,
                     'url': common.PLUGIN.get_url(
-                        action='module_entry',
+                        action='replay_entry',
                         next='play_r',
                         url_video=url
                     ),
@@ -525,9 +512,7 @@ def list_videos(params):
 
 
 @common.PLUGIN.mem_cached(common.CACHE_TIME)
-def list_live(params):
-    """Build live listing"""
-    lives = []
+def get_live_tv_item(params, context_menu):
 
     title = ''
     plot = ''
@@ -579,28 +564,19 @@ def list_live(params):
         }
     }
 
-    lives.append({
+    return {
         'label': title,
         'fanart': img,
         'thumb': img,
         'url': common.PLUGIN.get_url(
-            action='module_entry',
+            action='replay_entry',
             next='play_l',
             url_live=url_live,
         ),
         'is_playable': True,
         'info': info,
         'context_menu': context_menu
-    })
-
-    return common.PLUGIN.create_listing(
-        lives,
-        sort_methods=(
-            common.sp.xbmcplugin.SORT_METHOD_UNSORTED,
-            common.sp.xbmcplugin.SORT_METHOD_LABEL
-        ),
-        category=common.get_window_title()
-    )
+    }
 
 
 @common.PLUGIN.mem_cached(common.CACHE_TIME)

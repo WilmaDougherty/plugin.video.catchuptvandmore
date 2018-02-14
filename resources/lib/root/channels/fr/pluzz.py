@@ -196,7 +196,7 @@ def replay_entry(params):
         modes.append({
             'label': 'Replay',
             'url': common.PLUGIN.get_url(
-                action='module_entry',
+                action='replay_entry',
                 next=next_replay,
                 mode='replay',
                 page='1',
@@ -211,7 +211,7 @@ def replay_entry(params):
         modes.append({
             'label': 'Videos',
             'url': common.PLUGIN.get_url(
-                action='module_entry',
+                action='replay_entry',
                 next='list_videos_ftvsport',
                 mode='videos',
                 page='1',
@@ -280,7 +280,7 @@ def root(params):
         modes.append({
             'label': 'Replay',
             'url': common.PLUGIN.get_url(
-                action='module_entry',
+                action='replay_entry',
                 next=next_replay,
                 mode='replay',
                 page='1',
@@ -294,7 +294,7 @@ def root(params):
     modes.append({
         'label': _('Live TV'),
         'url': common.PLUGIN.get_url(
-            action='module_entry',
+            action='replay_entry',
             next='live_cat',
             mode='live',
             category='%s Live TV' % params.submodule_name.upper(),
@@ -308,7 +308,7 @@ def root(params):
         modes.append({
             'label': 'Videos',
             'url': common.PLUGIN.get_url(
-                action='module_entry',
+                action='replay_entry',
                 next='list_videos_ftvsport',
                 mode='videos',
                 page='1',
@@ -369,7 +369,7 @@ def list_shows(params):
                 shows.append({
                     'label': rubrique_title,
                     'url': common.PLUGIN.get_url(
-                        action='module_entry',
+                        action='replay_entry',
                         rubrique=rubrique,
                         next='list_shows_2_cat',
                         window_title=rubrique_title
@@ -381,7 +381,7 @@ def list_shows(params):
         shows.append({
             'label': common.ADDON.get_localized_string(30104),
             'url': common.PLUGIN.get_url(
-                action='module_entry',
+                action='replay_entry',
                 next='list_shows_last',
                 page='0',
                 window_title=common.ADDON.get_localized_string(30104)
@@ -393,7 +393,7 @@ def list_shows(params):
         shows.append({
             'label': common.ADDON.get_localized_string(30103),
             'url': common.PLUGIN.get_url(
-                action='module_entry',
+                action='replay_entry',
                 next='search',
                 page='0',
                 window_title=common.ADDON.get_localized_string(30103)
@@ -405,7 +405,7 @@ def list_shows(params):
         shows.append({
             'label': common.ADDON.get_localized_string(30105),
             'url': common.PLUGIN.get_url(
-                action='module_entry',
+                action='replay_entry',
                 next='list_shows_from_a_to_z',
                 window_title=common.ADDON.get_localized_string(30105)
             ),
@@ -417,7 +417,7 @@ def list_shows(params):
         shows.append({
             'label': common.ADDON.get_localized_string(30106),
             'url': common.PLUGIN.get_url(
-                action='module_entry',
+                action='replay_entry',
                 next='list_shows_2_from_a_to_z_CATEGORIES',
                 page='0',
                 url=URL_ALPHA % ('asc', '%s'),
@@ -430,7 +430,7 @@ def list_shows(params):
         shows.append({
             'label': common.ADDON.get_localized_string(30107),
             'url': common.PLUGIN.get_url(
-                action='module_entry',
+                action='replay_entry',
                 next='list_shows_2_from_a_to_z_CATEGORIES',
                 page='0',
                 url=URL_ALPHA % ('desc', '%s'),
@@ -449,7 +449,7 @@ def list_shows(params):
             shows.append({
                 'label': title,
                 'url': common.PLUGIN.get_url(
-                    action='module_entry',
+                    action='replay_entry',
                     next='list_videos_last',
                     page='0',
                     url=url,
@@ -508,7 +508,7 @@ def list_shows(params):
                             'thumb': icon,
                             'fanart': icon,
                             'url': common.PLUGIN.get_url(
-                                action='module_entry',
+                                action='replay_entry',
                                 next='list_videos_1',
                                 id_programme=id_programme,
                                 search=False,
@@ -524,7 +524,7 @@ def list_shows(params):
             shows.append({
                 'label': common.ADDON.get_localized_string(30100),
                 'url': common.PLUGIN.get_url(
-                    action='module_entry',
+                    action='replay_entry',
                     next='list_shows_2_from_a_to_z_CATEGORIES',
                     sens=params.sens,
                     page=str(int(params.page) + 100),
@@ -594,7 +594,7 @@ def list_videos(params):
                 'fanart': image,
                 'thumb': image,
                 'url': common.PLUGIN.get_url(
-                    action='module_entry',
+                    action='replay_entry',
                     next='play_r',
                     id_diffusion=id_diffusion
                 ),
@@ -607,7 +607,7 @@ def list_videos(params):
         videos.append({
             'label': common.ADDON.get_localized_string(30100),
             'url': common.PLUGIN.get_url(
-                action='module_entry',
+                action='replay_entry',
                 mode=params.mode,
                 next=params.next,
                 page=str(int(params.page) + 1),
@@ -770,7 +770,7 @@ def list_videos(params):
                         'fanart': image,
                         'thumb': image,
                         'url': common.PLUGIN.get_url(
-                            action='module_entry',
+                            action='replay_entry',
                             next='play_r',
                             id_diffusion=id_diffusion
                         ),
@@ -784,7 +784,7 @@ def list_videos(params):
             videos.append({
                 'label': common.ADDON.get_localized_string(30100),
                 'url': common.PLUGIN.get_url(
-                    action='module_entry',
+                    action='replay_entry',
                     next='list_videos_search',
                     query=params.query,
                     page=str(int(params.page) + 20),
@@ -800,7 +800,7 @@ def list_videos(params):
             videos.append({
                 'label': common.ADDON.get_localized_string(30100),
                 'url': common.PLUGIN.get_url(
-                    action='module_entry',
+                    action='replay_entry',
                     url=params.url,
                     next=params.next,
                     page=str(int(params.page) + 20),
@@ -876,7 +876,7 @@ def list_live(params):
                     'fanart': image,
                     'thumb': image,
                     'url': common.PLUGIN.get_url(
-                        action='module_entry',
+                        action='replay_entry',
                         next='play_l',
                         id_diffusion=id_diffusion
                     ),
@@ -914,7 +914,7 @@ def list_live(params):
                 'fanart': image,
                 'thumb': image,
                 'url': common.PLUGIN.get_url(
-                    action='module_entry',
+                    action='replay_entry',
                     next='list_live'
                 ),
                 'is_playable': False,
@@ -938,7 +938,7 @@ def list_live(params):
         lives.append({
             'label': title,
             'url': common.PLUGIN.get_url(
-                action='module_entry',
+                action='replay_entry',
                 next='play_l'
             ),
             'is_playable': True,
@@ -963,7 +963,7 @@ def list_live(params):
             lives.append({
                 'label': title,
                 'url': common.PLUGIN.get_url(
-                    action='module_entry',
+                    action='replay_entry',
                     next='play_l',
                     id_stream=id_stream
                 ),
@@ -989,7 +989,7 @@ def list_live(params):
             lives.append({
                 'label': title,
                 'url': common.PLUGIN.get_url(
-                    action='module_entry',
+                    action='replay_entry',
                     next='play_l',
                     id_stream=id_stream
                 ),
@@ -1074,7 +1074,7 @@ def list_live(params):
                 'fanart': image,
                 'thumb': image,
                 'url': common.PLUGIN.get_url(
-                    action='module_entry',
+                    action='replay_entry',
                     next='play_l',
                 ),
                 'is_playable': True,

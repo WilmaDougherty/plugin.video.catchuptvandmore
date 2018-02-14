@@ -79,7 +79,7 @@ URL_EMISSIONS_CNEWS = URL_ROOT_SITE + '/emissions'
 URL_INFO_CONTENT = 'http://service.canal-plus.com/' \
                    'video/rest/getvideos/%s/%s?format=json'
 
-submodule_name_CATALOG = {
+SUBMODULE_NAME_CATALOG = {
     'cplus': 'cplus',
     'c8': 'd8',
     'cstar': 'd17',
@@ -87,19 +87,18 @@ submodule_name_CATALOG = {
 }
 
 
-def module_entry(params):
-    """Entry function of the module"""
-    if 'root' in params.next:
-        return root(params)
-    elif 'list_shows' in params.next:
+def replay_entry(params):
+    if 'next' not in params:
+        params['next'] = 'list_shows_1'
         return list_shows(params)
-    elif 'list_videos' in params.next:
-        return list_videos(params)
-    elif 'live' in params.next:
-        return list_live(params)
-    elif 'play' in params.next:
-        return get_video_url(params)
-    return None
+    else:
+        if 'list_shows' in params.next:
+            return list_shows(params)
+        elif 'list_videos' in params.next:
+            return list_videos(params)
+        elif 'play' in params.next:
+            return get_video_url(params)
+        return None
 
 
 """ Unused
@@ -118,45 +117,6 @@ def get_channel_id(params):
         return '1'
     elif params.submodule_name == 'cstar':
         return '2'
-
-
-@common.PLUGIN.mem_cached(common.CACHE_TIME)
-def root(params):
-    """Add Replay and Live in the listing"""
-    modes = []
-
-    # Add Replay
-    modes.append({
-        'label': 'Replay',
-        'url': common.PLUGIN.get_url(
-            action='module_entry',
-            next='list_shows_1',
-            category='%s Replay' % params.submodule_name.upper(),
-            window_title='%s Replay' % params.submodule_name
-        ),
-        'context_menu': context_menu
-    })
-
-    # Add Live
-    modes.append({
-        'label': _('Live TV'),
-        'url': common.PLUGIN.get_url(
-            action='module_entry',
-            next='live_cat',
-            category='%s Live TV' % params.submodule_name.upper(),
-            window_title='%s Live TV' % params.submodule_name
-        ),
-        'context_menu': context_menu
-    })
-
-    return common.PLUGIN.create_listing(
-        modes,
-        sort_methods=(
-            common.sp.xbmcplugin.SORT_METHOD_UNSORTED,
-            common.sp.xbmcplugin.SORT_METHOD_LABEL
-        ),
-        category=common.get_window_title()
-    )
 
 
 @common.PLUGIN.mem_cached(common.CACHE_TIME)
@@ -188,7 +148,7 @@ def list_shows(params):
                 shows.append({
                     'label': category_name,
                     'url': common.PLUGIN.get_url(
-                        action='module_entry',
+                        action='replay_entry',
                         category_url=category_url,
                         category_name=category_name,
                         next='list_shows_2',
@@ -218,7 +178,7 @@ def list_shows(params):
                 shows.append({
                     'label': category_name,
                     'url': common.PLUGIN.get_url(
-                        action='module_entry',
+                        action='replay_entry',
                         category_url=category_url,
                         page="1",
                         category_name=category_name,
@@ -252,7 +212,7 @@ def list_shows(params):
                     'thumb': category_img,
                     'fanart': category_img,
                     'url': common.PLUGIN.get_url(
-                        action='module_entry',
+                        action='replay_entry',
                         category_url=category_url,
                         page="1",
                         category_name=category_name,
@@ -281,7 +241,7 @@ def list_shows(params):
             shows.append({
                 'label': title,
                 'url': common.PLUGIN.get_url(
-                    action='module_entry',
+                    action='replay_entry',
                     slug=slug,
                     next='list_shows_2',
                     title=title,
@@ -311,7 +271,7 @@ def list_shows(params):
                     shows.append({
                         'label': title,
                         'url': common.PLUGIN.get_url(
-                            action='module_entry',
+                            action='replay_entry',
                             next='list_videos_cat',
                             id=id,
                             videos_recent=videos_recent,
@@ -347,7 +307,7 @@ def list_shows(params):
                     'thumb': category_img,
                     'fanart': category_img,
                     'url': common.PLUGIN.get_url(
-                        action='module_entry',
+                        action='replay_entry',
                         category_url=category_url,
                         category_name=category_name,
                         next='list_shows_2',
@@ -374,7 +334,7 @@ def list_shows(params):
             shows.append({
                 'label': section,
                 'url': common.PLUGIN.get_url(
-                    action='module_entry',
+                    action='replay_entry',
                     category_url=params.category_url,
                     category_name=params.category_name,
                     category_section=section,
@@ -468,7 +428,7 @@ def list_videos(params):
                 'thumb': thumb,
                 'fanart': thumb,
                 'url': common.PLUGIN.get_url(
-                    action='module_entry',
+                    action='replay_entry',
                     next='play_r',
                     id=id
                 ),
@@ -481,7 +441,7 @@ def list_videos(params):
         videos.append({
             'label': common.ADDON.get_localized_string(30100),
             'url': common.PLUGIN.get_url(
-                action='module_entry',
+                action='replay_entry',
                 category_url=params.category_url,
                 category_name=params.category_name,
                 next='list_videos',
@@ -557,7 +517,7 @@ def list_videos(params):
                 'label': title,
                 'thumb': thumb,
                 'url': common.PLUGIN.get_url(
-                    action='module_entry',
+                    action='replay_entry',
                     next='play_r',
                     id=id,
                 ),
@@ -635,7 +595,7 @@ def list_videos(params):
                         'thumb': thumb,
                         'fanart': thumb,
                         'url': common.PLUGIN.get_url(
-                            action='module_entry',
+                            action='replay_entry',
                             next='play_r',
                             id=id
                         ),
@@ -663,9 +623,7 @@ def list_videos(params):
 
 
 @common.PLUGIN.mem_cached(common.CACHE_TIME)
-def list_live(params):
-    """Build live listing"""
-    lives = []
+def get_live_tv_item(params, context_menu):
 
     title = ''
     plot = ''
@@ -699,9 +657,9 @@ def list_live(params):
 
     file_path_json = utils.download_catalog(
         URL_INFO_CONTENT % (
-            submodule_name_CATALOG[params.submodule_name], video_id_re[0]),
+            SUBMODULE_NAME_CATALOG[params.submodule_name], video_id_re[0]),
         '%s_%s_live.json' % (
-            submodule_name_CATALOG[params.submodule_name], video_id_re[0])
+            SUBMODULE_NAME_CATALOG[params.submodule_name], video_id_re[0])
     )
     file_live_json = open(file_path_json).read()
     json_parser = json.loads(file_live_json)
@@ -719,28 +677,19 @@ def list_live(params):
         }
     }
 
-    lives.append({
+    return {
         'label': title,
         'fanart': img,
         'thumb': img,
         'url': common.PLUGIN.get_url(
-            action='module_entry',
+            action='replay_entry',
             next='play_l',
             url=url_live,
         ),
         'is_playable': True,
         'info': info,
         'context_menu': context_menu
-    })
-
-    return common.PLUGIN.create_listing(
-        lives,
-        sort_methods=(
-            common.sp.xbmcplugin.SORT_METHOD_UNSORTED,
-            common.sp.xbmcplugin.SORT_METHOD_LABEL
-        ),
-        category=common.get_window_title()
-    )
+    }
 
 
 @common.PLUGIN.mem_cached(common.CACHE_TIME)
@@ -749,7 +698,7 @@ def get_video_url(params):
     if params.next == 'play_r' or params.next == 'download_video':
         file_video = utils.get_webcontent(
             URL_INFO_CONTENT % (
-                submodule_name_CATALOG[params.submodule_name], params.id)
+                SUBMODULE_NAME_CATALOG[params.submodule_name], params.id)
         )
         media_json = json.loads(file_video)
         return media_json['MEDIA']['VIDEOS']['HLS'].encode('utf-8')

@@ -127,7 +127,7 @@ def root(params):
     modes.append({
         'label': 'Replay',
         'url': common.PLUGIN.get_url(
-            action='module_entry',
+            action='replay_entry',
             next='list_shows_1',
             category='%s Replay' % params.submodule_name.upper(),
             window_title='%s Replay' % params.submodule_name
@@ -139,7 +139,7 @@ def root(params):
     modes.append({
         'label': _('Live TV'),
         'url': common.PLUGIN.get_url(
-            action='module_entry',
+            action='replay_entry',
             next='live_cat',
             category='%s Live TV' % params.submodule_name.upper(),
             window_title='%s Live TV' % params.submodule_name
@@ -169,7 +169,7 @@ def list_shows(params):
             'label': emission_title,
             'url': common.PLUGIN.get_url(
                 emission_title=emission_title,
-                action='module_entry',
+                action='replay_entry',
                 next='list_shows_2',
                 window_title=emission_title
             ),
@@ -189,7 +189,7 @@ def list_shows(params):
                         shows.append({
                             'label': category_name,
                             'url': common.PLUGIN.get_url(
-                                action='module_entry',
+                                action='replay_entry',
                                 category_url=category_url,
                                 category_name=category_name,
                                 next='list_videos_categorie',
@@ -217,7 +217,7 @@ def list_shows(params):
                 'label': emission_title,
                 'url': common.PLUGIN.get_url(
                     emission_title=emission_title,
-                    action='module_entry',
+                    action='replay_entry',
                     emission_id=emission_id,
                     next='list_videos_emission',
                     window_title=emission_title
@@ -302,7 +302,7 @@ def list_videos(params):
                 'thumb': img,
                 'fanart': img,
                 'url': common.PLUGIN.get_url(
-                    action='module_entry',
+                    action='replay_entry',
                     next='play_r',
                     url_video=url_video
                 ),
@@ -364,7 +364,7 @@ def list_videos(params):
                     'thumb': img,
                     'fanart': img,
                     'url': common.PLUGIN.get_url(
-                        action='module_entry',
+                        action='replay_entry',
                         next='play_r_categorie',
                         video_id=video_id
                     ),
@@ -437,7 +437,7 @@ def list_live(params):
             'fanart': img,
             'thumb': img,
             'url': common.PLUGIN.get_url(
-                action='module_entry',
+                action='replay_entry',
                 next='play_l',
                 url_live=url_live,
             ),

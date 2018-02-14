@@ -76,7 +76,7 @@ def root(params):
         modes.append({
             'label': category_name,
             'url': common.PLUGIN.get_url(
-                action='module_entry',
+                action='replay_entry',
                 category_url=category_url,
                 category_name=category_name,
                 next='list_shows_1',
@@ -113,7 +113,7 @@ def list_shows(params):
         shows.append({
             'label': show_title,
             'url': common.PLUGIN.get_url(
-                action='module_entry',
+                action='replay_entry',
                 next='list_videos_1',
                 title=show_title,
                 category_url=show_url,
@@ -184,7 +184,7 @@ def list_videos(params):
                 'label': video_title,
                 'thumb': video_img,
                 'url': common.PLUGIN.get_url(
-                    action='module_entry',
+                    action='replay_entry',
                     next='play_r',
                     video_url=video_url
                 ),

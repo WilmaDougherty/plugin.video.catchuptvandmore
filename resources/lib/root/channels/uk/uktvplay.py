@@ -101,7 +101,7 @@ def root(params):
     modes.append({
         'label': 'Replay',
         'url': common.PLUGIN.get_url(
-            action='module_entry',
+            action='replay_entry',
             next='list_shows_1',
             category='%s Replay' % params.submodule_name.upper(),
             window_title='%s Replay' % params.submodule_name
@@ -146,7 +146,7 @@ def list_shows(params):
                     'label': show_title,
                     'thumb': show_img,
                     'url': common.PLUGIN.get_url(
-                        action='module_entry',
+                        action='replay_entry',
                         next='list_shows_2',
                         title=show_title,
                         show_url=show_url,
@@ -159,7 +159,7 @@ def list_shows(params):
                     'label': show_title,
                     'thumb': show_img,
                     'url': common.PLUGIN.get_url(
-                        action='module_entry',
+                        action='replay_entry',
                         next='list_videos_1',
                         title=show_title,
                         show_url=show_url,
@@ -190,7 +190,7 @@ def list_shows(params):
             shows.append({
                 'label': season_title,
                 'url': common.PLUGIN.get_url(
-                    action='module_entry',
+                    action='replay_entry',
                     next='list_videos_1',
                     title=params.title + '_' + season_title,
                     show_url=params.show_url,
@@ -289,7 +289,7 @@ def list_videos(params):
                     'thumb': video_img,
                     'fanart': video_img,
                     'url': common.PLUGIN.get_url(
-                        action='module_entry',
+                        action='replay_entry',
                         next='play_r',
                         data_vidid=data_vidid,
                         data_account=data_account,
@@ -358,7 +358,7 @@ def list_videos(params):
                 'thumb': video_img,
                 'fanart': video_img,
                 'url': common.PLUGIN.get_url(
-                    action='module_entry',
+                    action='replay_entry',
                     next='play_r',
                     data_vidid=data_vidid,
                     data_account=data_account,
@@ -429,7 +429,7 @@ def list_videos(params):
             'thumb': video_img,
             'fanart': video_img,
             'url': common.PLUGIN.get_url(
-                action='module_entry',
+                action='replay_entry',
                 next='play_r',
                 data_vidid=data_vidid,
                 data_account=data_account,

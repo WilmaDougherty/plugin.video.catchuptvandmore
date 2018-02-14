@@ -74,19 +74,18 @@ URL_LIVE_TV = 'http://replay.gulli.fr/Direct'
 # program_id
 
 
-def module_entry(params):
-    """Entry function of the module"""
-    if 'root' in params.next:
-        return root(params)
-    elif 'list_shows' in params.next:
+def replay_entry(params):
+    if 'next' not in params:
+        params['next'] = 'list_shows_1'
         return list_shows(params)
-    elif 'list_videos' in params.next:
-        return list_videos(params)
-    elif 'live' in params.next:
-        return list_live(params)
-    elif 'play' in params.next:
-        return get_video_url(params)
-    return None
+    else:
+        if 'list_shows' in params.next:
+            return list_shows(params)
+        elif 'list_videos' in params.next:
+            return list_videos(params)
+        elif 'play' in params.next:
+            return get_video_url(params)
+        return None
 
 
 @common.PLUGIN.mem_cached(common.CACHE_TIME)
@@ -99,45 +98,6 @@ def get_api_key():
 
 
 @common.PLUGIN.mem_cached(common.CACHE_TIME)
-def root(params):
-    """Add Replay and Live in the listing"""
-    modes = []
-
-    # Add Replay
-    modes.append({
-        'label': 'Replay',
-        'url': common.PLUGIN.get_url(
-            action='module_entry',
-            next='list_shows_1',
-            category='%s Replay' % params.submodule_name.upper(),
-            window_title='%s Replay' % params.submodule_name
-        ),
-        'context_menu': context_menu
-    })
-
-    # Add Live
-    modes.append({
-        'label': 'Live TV',
-        'url': common.PLUGIN.get_url(
-            action='module_entry',
-            next='live_cat',
-            category='%s Live TV' % params.submodule_name.upper(),
-            window_title='%s Live TV' % params.submodule_name
-        ),
-        'context_menu': context_menu
-    })
-
-    return common.PLUGIN.create_listing(
-        modes,
-        sort_methods=(
-            common.sp.xbmcplugin.SORT_METHOD_UNSORTED,
-            common.sp.xbmcplugin.SORT_METHOD_LABEL
-        ),
-        category=common.get_window_title()
-    )
-
-
-@common.PLUGIN.mem_cached(common.CACHE_TIME)
 def list_shows(params):
     """Build categories listing"""
     shows = []
@@ -147,7 +107,7 @@ def list_shows(params):
             shows.append({
                 'label': category_title,
                 'url': common.PLUGIN.get_url(
-                    action='module_entry',
+                    action='replay_entry',
                     category_url=category_url % get_api_key(),
                     next='list_shows_cat',
                     title=category_title,
@@ -183,7 +143,7 @@ def list_shows(params):
                 'thumb': fanart,
                 'fanart': fanart,
                 'url': common.PLUGIN.get_url(
-                    action='module_entry',
+                    action='replay_entry',
                     program_id=program_id,
                     next='list_videos',
                     title=program_title,
@@ -266,7 +226,7 @@ def list_videos(params):
             'thumb': thumb,
             'fanart': fanart,
             'url': common.PLUGIN.get_url(
-                action='module_entry',
+                action='replay_entry',
                 next='play_r',
                 url_streaming=url_streaming
             ),
@@ -288,9 +248,7 @@ def list_videos(params):
 
 
 @common.PLUGIN.mem_cached(common.CACHE_TIME)
-def list_live(params):
-    """Build live listing"""
-    lives = []
+def get_live_tv_item(params, context_menu):
 
     title = ''
     plot = ''
@@ -335,28 +293,19 @@ def list_live(params):
         }
     }
 
-    lives.append({
+    return {
         'label': title,
         'fanart': img,
         'thumb': img,
         'url': common.PLUGIN.get_url(
-            action='module_entry',
+            action='replay_entry',
             next='play_l',
             url_live=url_live,
         ),
         'is_playable': True,
         'info': info,
         'context_menu': context_menu
-    })
-
-    return common.PLUGIN.create_listing(
-        lives,
-        sort_methods=(
-            common.sp.xbmcplugin.SORT_METHOD_UNSORTED,
-            common.sp.xbmcplugin.SORT_METHOD_LABEL
-        ),
-        category=common.get_window_title()
-    )
+    }
 
 
 @common.PLUGIN.mem_cached(common.CACHE_TIME)

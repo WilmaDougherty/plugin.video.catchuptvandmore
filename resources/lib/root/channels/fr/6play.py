@@ -81,49 +81,20 @@ URL_JSON_VIDEO = 'https://pc.middleware.6play.fr/6play/v2/platforms/' \
 URL_IMG = 'https://images.6play.fr/v1/images/%s/raw'
 
 
-def module_entry(params):
-    """Entry function of the module"""
-    if 'root' in params.next:
-        return root(params)
-    elif 'list_shows' in params.next:
+def replay_entry(params):
+    if 'next' not in params:
+        params['next'] = 'list_shows_1'
         return list_shows(params)
-    elif 'list_videos' in params.next:
-        return list_videos(params)
-    elif 'live' in params.next:
+    else:
+        if 'list_shows' in params.next:
+            return list_shows(params)
+        elif 'list_videos' in params.next:
+            return list_videos(params)
+        elif 'live' in params.next:
+            return None
+        elif 'play' in params.next:
+            return get_video_url(params)
         return None
-    elif 'play' in params.next:
-        return get_video_url(params)
-    return None
-
-
-@common.PLUGIN.mem_cached(common.CACHE_TIME)
-def root(params):
-    """Add Replay and Live in the listing"""
-    """
-    modes = []
-
-    # Add Replay
-    modes.append({
-        'label': 'Replay',
-        'url': common.PLUGIN.get_url(
-            action='module_entry',
-            next='list_shows_1',
-            category='%s Replay' % params.submodule_name.upper(),
-            window_title='%s Replay' % params.submodule_name
-        ),
-    })
-
-    return common.PLUGIN.create_listing(
-        modes,
-        sort_methods=(
-            common.sp.xbmcplugin.SORT_METHOD_UNSORTED,
-            common.sp.xbmcplugin.SORT_METHOD_LABEL
-        ),
-    )
-    """
-    params.window_title = '%s Replay' % params.submodule_name
-    params.next = "list_shows_1"
-    return module_entry(params)
 
 
 @common.PLUGIN.mem_cached(common.CACHE_TIME)
@@ -166,7 +137,7 @@ def list_shows(params):
             shows.append({
                 'label': category_name,
                 'url': common.PLUGIN.get_url(
-                    action='module_entry',
+                    action='replay_entry',
                     category_id=category_id,
                     next='list_shows_2',
                     title=category_name,
@@ -217,7 +188,7 @@ def list_shows(params):
                 'thumb': program_img,
                 'fanart': program_fanart,
                 'url': common.PLUGIN.get_url(
-                    action='module_entry',
+                    action='replay_entry',
                     next='list_shows_3',
                     program_id=program_id,
                     program_img=program_img,
@@ -267,7 +238,7 @@ def list_shows(params):
                 'thumb': params.program_img,
                 'fanart': program_fanart,
                 'url': common.PLUGIN.get_url(
-                    action='module_entry',
+                    action='replay_entry',
                     next='list_videos',
                     program_id=params.program_id,
                     sub_category_id=sub_category_id,
@@ -289,7 +260,7 @@ def list_shows(params):
             'thumb': params.program_img,
             'fanart': program_fanart,
             'url': common.PLUGIN.get_url(
-                action='module_entry',
+                action='replay_entry',
                 next='list_videos',
                 program_id=params.program_id,
                 sub_category_id='null',
@@ -385,7 +356,7 @@ def list_videos(params):
             'label': title,
             'thumb': program_img,
             'url': common.PLUGIN.get_url(
-                action='module_entry',
+                action='replay_entry',
                 next='play',
                 video_id=video_id,
             ),

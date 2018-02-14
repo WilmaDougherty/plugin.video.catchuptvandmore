@@ -146,11 +146,11 @@ LABELS = {
 
 # SKELETON dictionary corresponds to the different level of menus of the addon
 SKELETON = {
-    'root': {
+    ('root', 'root'): {
 
-        'live_tv': {
+        ('live_tv', 'root'): {
 
-            'be': {
+            ('be', 'build_live_tv_menu'): {
                 'rtbf.auvio',
                 'bvn.bvn',
                 'brf.brf',
@@ -159,15 +159,13 @@ SKELETON = {
                 'rtl.clubrtl'
             },
 
-            'fr': {
+            ('fr', 'build_live_tv_menu'): {
                 'tf1.tf1',
                 'pluzz.france2',
                 'pluzz.france3',
                 'groupecanal.cplus',
                 'pluzz.france5',
-                '6play.m6',
                 'groupecanal.c8',
-                '6play.w9',
                 'tf1.tmc',
                 'tf1.nt1',
                 'nrj.nrj12',
@@ -179,37 +177,27 @@ SKELETON = {
                 'pluzz.franceo',
                 'tf1.hd1',
                 'lequipe.lequipe',
-                '6play.6ter',
                 'numero23.numero23',
                 'nrj.cherie25',
                 'pluzz.la_1ere',
                 'pluzz.franceinfo',
                 'bfmtv.bfmbusiness',
                 'bfmtv.rmc',
-                'bfmtv.01net',
-                'tf1.tfou',
-                'tf1.xtra',
                 'tf1.lci',
                 'lcp.lcp',
                 'bfmtv.rmcdecouverte',
-                '6play.stories',
-                '6play.bruce',
-                '6play.crazy_kitchen',
-                '6play.home',
-                '6play.styles',
-                '6play.comedy',
                 'publicsenat.publicsenat',
                 'pluzz.france3regions',
                 'pluzz.francetvsport'
             },
 
-            'jp': {
+            ('jp', 'build_live_tv_menu'): {
                 'nhk.nhknews',
                 'nhk.nhklifestyle',
                 'tbs.tbsnews'
             },
 
-            'ch': {
+            ('ch', 'build_live_tv_menu'): {
                 'srgssr.rts',
                 'srgssr.rsi',
                 'srgssr.srf',
@@ -217,7 +205,7 @@ SKELETON = {
                 'srgssr.swissinfo'
             },
 
-            'gb': {
+            ('gb', 'build_live_tv_menu'): {
                 'blaze.blaze',
                 'uktvplay.dave',
                 'uktvplay.really',
@@ -225,7 +213,7 @@ SKELETON = {
                 'uktvplay.drama'
             },
 
-            'wo': {
+            ('wo', 'build_live_tv_menu'): {
                 'tv5monde.tv5mondeafrique',
                 'arte.arte',
                 'euronews.euronews',
@@ -237,104 +225,102 @@ SKELETON = {
 
         },
 
-        'replay': {
+        ('replay', 'root'): {
 
-            'be': {
-                'rtbf.auvio',
-                'bvn.bvn',
-                'brf.brf',
-                'rtl.rtltvi',
-                'rtl.plugrtl',
-                'rtl.clubrtl'
+            ('be', 'root'): {
+                ('rtbf.auvio', 'replay_entry'),
+                ('bvn.bvn', 'replay_entry'),
+                ('brf.brf', 'replay_entry'),
+                ('rtl.rtltvi', 'replay_entry'),
+                ('rtl.plugrtl', 'replay_entry'),
+                ('rtl.clubrtl' 'replay_entry')
             },
 
-            'fr': {
-                'tf1.tf1',
-                'pluzz.france2',
-                'pluzz.france3',
-                'groupecanal.cplus',
-                'pluzz.france5',
-                '6play.m6',
-                'groupecanal.c8',
-                '6play.w9',
-                'tf1.tmc',
-                'tf1.nt1',
-                'nrj.nrj12',
-                'pluzz.france4',
-                'bfmtv.bfmtv',
-                'groupecanal.cnews',
-                'groupecanal.cstar',
-                'gulli.gulli',
-                'pluzz.franceo',
-                'tf1.hd1',
-                'lequipe.lequipe',
-                '6play.6ter',
-                'numero23.numero23',
-                'nrj.cherie25',
-                'pluzz.la_1ere',
-                'pluzz.franceinfo',
-                'bfmtv.bfmbusiness',
-                'bfmtv.rmc',
-                'bfmtv.01net',
-                'tf1.tfou',
-                'tf1.xtra',
-                'tf1.lci',
-                'lcp.lcp',
-                'bfmtv.rmcdecouverte',
-                '6play.stories',
-                '6play.bruce',
-                '6play.crazy_kitchen',
-                '6play.home',
-                '6play.styles',
-                '6play.comedy',
-                'publicsenat.publicsenat',
-                'pluzz.france3regions',
-                'pluzz.francetvsport'
+            ('fr', 'root'): {
+                ('tf1.tf1', 'replay_entry'),
+                ('pluzz.france2', 'replay_entry'),
+                ('pluzz.france3', 'replay_entry'),
+                ('groupecanal.cplus', 'replay_entry'),
+                ('pluzz.france5', 'replay_entry'),
+                ('6play.m6', 'replay_entry'),
+                ('groupecanal.c8', 'replay_entry'),
+                ('6play.w9', 'replay_entry'),
+                ('tf1.tmc', 'replay_entry'),
+                ('tf1.nt1', 'replay_entry'),
+                ('nrj.nrj12', 'replay_entry'),
+                ('pluzz.france4', 'replay_entry'),
+                ('bfmtv.bfmtv', 'replay_entry'),
+                ('groupecanal.cnews', 'replay_entry'),
+                ('groupecanal.cstar', 'replay_entry'),
+                ('gulli.gulli', 'replay_entry'),
+                ('pluzz.franceo', 'replay_entry'),
+                ('tf1.hd1', 'replay_entry'),
+                ('lequipe.lequipe', 'replay_entry'),
+                ('6play.6ter', 'replay_entry'),
+                ('numero23.numero23', 'replay_entry'),
+                ('nrj.cherie25', 'replay_entry'),
+                ('pluzz.la_1ere', 'replay_entry'),
+                ('pluzz.franceinfo', 'replay_entry'),
+                ('bfmtv.bfmbusiness', 'replay_entry'),
+                ('bfmtv.rmc', 'replay_entry'),
+                ('bfmtv.01net', 'replay_entry'),
+                ('tf1.tfou', 'replay_entry'),
+                ('tf1.xtra', 'replay_entry'),
+                ('tf1.lci', 'replay_entry'),
+                ('lcp.lcp', 'replay_entry'),
+                ('bfmtv.rmcdecouverte', 'replay_entry'),
+                ('6play.stories', 'replay_entry'),
+                ('6play.bruce', 'replay_entry'),
+                ('6play.crazy_kitchen', 'replay_entry'),
+                ('6play.home', 'replay_entry'),
+                ('6play.styles', 'replay_entry'),
+                ('6play.comedy', 'replay_entry'),
+                ('publicsenat.publicsenat', 'replay_entry'),
+                ('pluzz.france3regions', 'replay_entry'),
+                ('pluzz.francetvsport' 'replay_entry')
             },
 
-            'jp': {
-                'nhk.nhknews',
-                'nhk.nhklifestyle',
-                'tbs.tbsnews'
+            ('jp', 'root'): {
+                ('nhk.nhknews', 'replay_entry'),
+                ('nhk.nhklifestyle', 'replay_entry'),
+                ('tbs.tbsnews' 'replay_entry')
             },
 
-            'ch': {
-                'srgssr.rts',
-                'srgssr.rsi',
-                'srgssr.srf',
-                'srgssr.rtr',
-                'srgssr.swissinfo'
+            ('ch', 'root'): {
+                ('srgssr.rts', 'replay_entry'),
+                ('srgssr.rsi', 'replay_entry'),
+                ('srgssr.srf', 'replay_entry'),
+                ('srgssr.rtr', 'replay_entry'),
+                ('srgssr.swissinfo' 'replay_entry')
             },
 
-            'gb': {
-                'blaze.blaze',
-                'uktvplay.dave',
-                'uktvplay.really',
-                'uktvplay.yesterday',
-                'uktvplay.drama'
+            ('gb', 'root'): {
+                ('blaze.blaze', 'replay_entry'),
+                ('uktvplay.dave', 'replay_entry'),
+                ('uktvplay.really', 'replay_entry'),
+                ('uktvplay.yesterday', 'replay_entry'),
+                ('uktvplay.drama' 'replay_entry')
             },
 
-            'wo': {
-                'tv5monde.tv5mondeafrique',
-                'arte.arte',
-                'euronews.euronews',
-                'france24.france24',
-                'nhkworld.nhkworld',
-                'tv5monde.tv5monde',
-                'tv5monde.tivi5monde'
+            ('wo', 'root'): {
+                ('tv5monde.tv5mondeafrique', 'replay_entry'),
+                ('arte.arte', 'replay_entry'),
+                ('euronews.euronews', 'replay_entry'),
+                ('france24.france24', 'replay_entry'),
+                ('nhkworld.nhkworld', 'replay_entry'),
+                ('tv5monde.tv5monde', 'replay_entry'),
+                ('tv5monde.tivi5monde' 'replay_entry')
             }
 
         },
 
-        'websites': {
-            'allocine',
-            'tetesaclaques',
-            'taratata',
-            'noob',
-            'culturepub'
+        ('websites', 'root'): {
+            ('allocine', 'website_entry'),
+            ('tetesaclaques', 'website_entry'),
+            ('taratata', 'website_entry'),
+            ('noob', 'website_entry'),
+            ('culturepub', 'website_entry')
         }
     }
 }
-
-
 

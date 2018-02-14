@@ -106,59 +106,18 @@ def get_policy_key(data_account, data_player):
     return re.compile('policyKey:"(.+?)"').findall(file_js)[0]
 
 
-def module_entry(params):
-    """Entry function of the module"""
-    if 'root' in params.next:
-        return root(params)
-    if 'list_shows' in params.next:
+def replay_entry(params):
+    if 'next' not in params:
+        params['next'] = 'list_shows_1'
         return list_shows(params)
-    elif 'list_videos' in params.next:
-        return list_videos(params)
-    elif 'live' in params.next:
-        return list_live(params)
-    elif 'play' in params.next:
-        return get_video_url(params)
-    return None
-
-
-@common.PLUGIN.mem_cached(common.CACHE_TIME)
-def root(params):
-    """Add Replay and Live in the listing"""
-    modes = []
-
-    # Add Replay Desactiver
-    modes.append({
-        'label': 'Replay',
-        'url': common.PLUGIN.get_url(
-            action='module_entry',
-            next='list_shows_1',
-            category='%s Replay' % params.submodule_name.upper(),
-            window_title='%s Replay' % params.submodule_name
-        ),
-        'context_menu': context_menu
-    })
-
-    # Add Live
-    if params.submodule_name != '01net':
-        modes.append({
-            'label': 'Live TV',
-            'url': common.PLUGIN.get_url(
-                action='module_entry',
-                next='live_cat',
-                category='%s Live TV' % params.submodule_name.upper(),
-                window_title='%s Live TV' % params.submodule_name
-            ),
-            'context_menu': context_menu
-        })
-
-    return common.PLUGIN.create_listing(
-        modes,
-        sort_methods=(
-            common.sp.xbmcplugin.SORT_METHOD_UNSORTED,
-            common.sp.xbmcplugin.SORT_METHOD_LABEL
-        ),
-        category=common.get_window_title()
-    )
+    else:
+        if 'list_shows' in params.next:
+            return list_shows(params)
+        elif 'list_videos' in params.next:
+            return list_videos(params)
+        elif 'play' in params.next:
+            return get_video_url(params)
+        return None
 
 
 @common.PLUGIN.mem_cached(common.CACHE_TIME)
@@ -197,7 +156,7 @@ def list_shows(params):
                 'label': video_title,
                 'thumb': video_img,
                 'url': common.PLUGIN.get_url(
-                    action='module_entry',
+                    action='replay_entry',
                     next='list_videos_1',
                     video_id=video_id,
                     title=video_title,
@@ -227,7 +186,7 @@ def list_shows(params):
                     'label': title,
                     'thumb': image_url,
                     'url': common.PLUGIN.get_url(
-                        action='module_entry',
+                        action='replay_entry',
                         category=category,
                         next='list_videos_1',
                         title=title,
@@ -332,7 +291,7 @@ def list_videos(params):
             'thumb': video_img,
             'fanart': video_img,
             'url': common.PLUGIN.get_url(
-                action='module_entry',
+                action='replay_entry',
                 next='play_r',
                 video_url=video_url
             ),
@@ -405,7 +364,7 @@ def list_videos(params):
                     'label': title,
                     'thumb': image,
                     'url': common.PLUGIN.get_url(
-                        action='module_entry',
+                        action='replay_entry',
                         next='play_r',
                         video_id=video_id,
                         video_id_ext=video_id_ext
@@ -419,7 +378,7 @@ def list_videos(params):
             videos.append({
                 'label': common.ADDON.get_localized_string(30100),
                 'url': common.PLUGIN.get_url(
-                    action='module_entry',
+                    action='replay_entry',
                     category=params.category,
                     next='list_videos_1',
                     title=title,
@@ -448,9 +407,8 @@ def list_videos(params):
 
 
 @common.PLUGIN.mem_cached(common.CACHE_TIME)
-def list_live(params):
+def get_live_tv_item(params, context_menu):
     """Build live listing"""
-    lives = []
 
     title = ''
     plot = ''
@@ -500,19 +458,19 @@ def list_live(params):
             }
         }
 
-        lives.append({
+        return {
             'label': title,
             'fanart': img,
             'thumb': img,
             'url': common.PLUGIN.get_url(
-                action='module_entry',
+                action='replay_entry',
                 next='play_l',
                 url_live=url_live,
             ),
             'is_playable': True,
             'info': info,
             'context_menu': context_menu
-        })
+        }
 
     else:
 
@@ -536,19 +494,19 @@ def list_live(params):
                 }
             }
 
-            lives.append({
+            return {
                 'label': title,
                 'fanart': img,
                 'thumb': img,
                 'url': common.PLUGIN.get_url(
-                    action='module_entry',
+                    action='replay_entry',
                     next='play_l',
                     url_live=url_live,
                 ),
                 'is_playable': True,
                 'info': info,
                 'context_menu': context_menu
-            })
+            }
 
             # BFM PARIS
             file_paris_path = utils.download_catalog(
@@ -599,19 +557,19 @@ def list_live(params):
                 }
             }
 
-            lives.append({
+            return {
                 'label': title_paris,
                 'fanart': img,
                 'thumb': img,
                 'url': common.PLUGIN.get_url(
-                    action='module_entry',
+                    action='replay_entry',
                     next='play_l',
                     url_live=url_live_paris,
                 ),
                 'is_playable': True,
                 'info': info_paris,
                 'context_menu': context_menu
-            })
+            }
 
         elif params.submodule_name == 'bfmbusiness':
 
@@ -659,19 +617,19 @@ def list_live(params):
                 }
             }
 
-            lives.append({
+            return {
                 'label': title,
                 'fanart': img,
                 'thumb': img,
                 'url': common.PLUGIN.get_url(
-                    action='module_entry',
+                    action='replay_entry',
                     next='play_l',
                     url_live=url_live,
                 ),
                 'is_playable': True,
                 'info': info,
                 'context_menu': context_menu
-            })
+            }
 
         elif params.submodule_name == 'rmc':
 
@@ -720,33 +678,25 @@ def list_live(params):
                 }
             }
 
-            lives.append({
+            return {
                 'label': title,
                 'fanart': img,
                 'thumb': img,
                 'url': common.PLUGIN.get_url(
-                    action='module_entry',
+                    action='replay_entry',
                     next='play_l',
                     url_live=url_live,
                 ),
                 'is_playable': True,
                 'info': info,
                 'context_menu': context_menu
-            })
+            }
 
         elif params.submodule_name == '01net':
 
             # TO DO
 
             return None
-
-    return common.PLUGIN.create_listing(
-        lives,
-        sort_methods=(
-            common.sp.xbmcplugin.SORT_METHOD_UNSORTED,
-            common.sp.xbmcplugin.SORT_METHOD_LABEL
-        )
-    )
 
 
 @common.PLUGIN.mem_cached(common.CACHE_TIME)

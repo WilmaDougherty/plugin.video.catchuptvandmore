@@ -65,7 +65,7 @@ def root(params):
         modes.append({
             'label': 'Replay',
             'url': common.PLUGIN.get_url(
-                action='module_entry',
+                action='replay_entry',
                 next='list_shows_1',
                 category='%s Replay' % params.submodule_name.upper(),
                 window_title='%s Replay' % params.submodule_name.upper()
@@ -76,7 +76,7 @@ def root(params):
     modes.append({
         'label': 'Live TV',
         'url': common.PLUGIN.get_url(
-            action='module_entry',
+            action='replay_entry',
             next='live_cat',
             category='%s Live TV' % params.submodule_name.upper(),
             window_title='%s Live TV' % params.submodule_name.upper()
@@ -187,7 +187,7 @@ def list_live(params):
         'fanart': img,
         'thumb': img,
         'url': common.PLUGIN.get_url(
-            action='module_entry',
+            action='replay_entry',
             next='play_l',
             url=url_live,
         ),

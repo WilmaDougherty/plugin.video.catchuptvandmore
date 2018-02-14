@@ -67,15 +67,18 @@ def root(params):
     if 'skeleton_path' not in params:
         # We just launch the addon
         params.module_path = 'root'
-        params.skeleton_path = 'root'
+        params.skeleton_path = 'root,root'
 
     current_dict = skeleton.SKELETON
     for key in params.skeleton_path.split('-'):
-        current_dict = current_dict[key]
+        key_splitted = key.split(',')
+        current_dict = current_dict[(key_splitted[0], key_splitted[1])]
 
     # First we sort the current menu
     menu = []
-    for item_id in current_dict:
+    for value in current_dict:
+        item_id = value[0]
+        item_next = value[1]
         # If menu item isn't disable
         if common.PLUGIN.get_setting(item_id):
             # Get order value in settings file
@@ -94,18 +97,6 @@ def root(params):
             item_folder = item_id
             if item_id in skeleton.FOLDERS:
                 item_folder = skeleton.FOLDERS[item_id]
-
-            # Check the next action to do
-            item_next = ''
-            if isinstance(current_dict, dict):
-                item_next = 'root'
-            elif 'live_tv' in params.skeleton_path:
-                item_next = 'build_live_tv_menu'
-            elif 'replay' in params.skeleton_path:
-                item_next = 'replay_entry'
-            elif 'website' in params.skeleton_path:
-                item_next = 'build_website_menu'
-            # This part can be extended if needed ...
 
             item = (item_order, item_id, item_title, item_folder, item_next)
             menu.append(item)
@@ -182,7 +173,7 @@ def root(params):
                 action=item_next,
                 item_id=item_id,
                 module_path=params.module_path + '-' + item_folder,
-                skeleton_path=params.skeleton_path + '-' + item_id,
+                skeleton_path=params.skeleton_path + '-' + item_id + ',' + item_next,
                 window_title=item_title
             ),
             'context_menu': context_menu
@@ -204,7 +195,9 @@ def root(params):
     )
 
 
+# @common.PLUGIN.mem_cached(common.CACHE_TIME)
 def get_module(params):
+    print '# params ' + repr(params)
     module_path = []
     module_name = ''
 
@@ -248,6 +241,99 @@ def get_module(params):
 def replay_entry(params):
     module = get_module(params)
     return module.replay_entry(params)
+
+
+@common.PLUGIN.action()
+def build_live_tv_menu(params):
+    print '# params ' + repr(params)
+    current_dict = skeleton.SKELETON
+    for key in params.skeleton_path.split('-'):
+        key_splitted = key.split(',')
+        current_dict = current_dict[(key_splitted[0], key_splitted[1])]
+
+    # First we sort the current menu
+    menu = []
+    for item_id in current_dict:
+        # If menu item isn't disable
+        if common.PLUGIN.get_setting(item_id):
+            # Get order value in settings file
+            item_order = common.PLUGIN.get_setting(item_id + '.order')
+
+            # Get english item title in LABELS dict in skeleton file
+            # and check if this title has any translated version
+            item_title = ''
+            try:
+                item_title = common.PLUGIN.get_localized_string(
+                    skeleton.LABELS[item_id])
+            except TypeError:
+                item_title = skeleton.LABELS[item_id]
+
+            # Build step by step the module pathfile
+            item_folder = item_id
+            if item_id in skeleton.FOLDERS:
+                item_folder = skeleton.FOLDERS[item_id]
+
+            item = (item_order, item_id, item_title, item_folder)
+            menu.append(item)
+
+    menu = sorted(menu, key=lambda x: x[0])
+
+    listing = []
+    for index, (item_order, item_id, item_title, item_folder) \
+            in enumerate(menu):
+
+        # Build context menu (Move up, move down, vpn, ...)
+        context_menu = []
+
+        item_down = (
+            _('Move down'),
+            'XBMC.RunPlugin(' + common.PLUGIN.get_url(
+                action='move',
+                direction='down',
+                item_id_order=item_id + '.order',
+                displayed_items=menu) + ')'
+        )
+        item_up = (
+            _('Move up'),
+            'XBMC.RunPlugin(' + common.PLUGIN.get_url(
+                action='move',
+                direction='up',
+                item_id_order=item_id + '.order',
+                displayed_items=menu) + ')'
+        )
+
+        if index == 0:
+            context_menu.append(item_down)
+        elif index == len(menu) - 1:
+            context_menu.append(item_up)
+        else:
+            context_menu.append(item_up)
+            context_menu.append(item_down)
+
+        hide = (
+            _('Hide'),
+            'XBMC.RunPlugin(' + common.PLUGIN.get_url(
+                action='hide',
+                item_id=item_id) + ')'
+        )
+        context_menu.append(hide)
+        context_menu.append(utils.vpn_context_menu_item())
+
+        params['module_path'] = params.module_path + '-' + item_folder
+        module = get_module(params)
+
+        item = module.get_live_tv_item(params, context_menu)
+
+        # Append this item to listing
+        listing.append(item)
+        break
+
+    return common.PLUGIN.create_listing(
+        listing,
+        sort_methods=(
+            common.sp.xbmcplugin.SORT_METHOD_UNSORTED,),
+        category=common.get_window_title()
+    )
 
 
 @common.PLUGIN.action()
